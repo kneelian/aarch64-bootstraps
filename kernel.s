@@ -146,7 +146,7 @@
 		// The framebuffer device is basically just
 		// a chunk of RAM we dedicate that QEMU will read
 		// out of and blit to the screen. 
-		
+
 		// To configure the framebuffer, we must first communicate
 		// with QEMU itself, by trawling the QEMU config tree
 		// in the device's memory, figuring out if we can use the DMA
@@ -439,7 +439,7 @@
 		};
 
 		*/
-
+	
 	mov x20, 1024
 	mov x21, 768
 	mul x20, x20, x21
@@ -455,6 +455,25 @@
 		b framebuffer_example
 
 	framebuffer_example_end:
+
+	ldr x30, =RAMFB_INITIALISED
+	str x30, [sp, -8]!
+	bl  _uputs
+	mov x30, 0xa
+	str x30, [sp, -8]!
+	mov x30, 0xd
+	str x30, [sp, -8]!
+	bl  _uputc
+	bl  _uputc
+
+	mov x0, 300
+	mov x1, 300
+	mov x2, 0
+	sub x2, x2, 1
+	str w0, [sp, -4]!
+	str w1, [sp, -4]!
+	str w2, [sp, -4]!
+	bl _drawpx
 
 	997:
 
@@ -513,17 +532,48 @@
 	1000:
 		b 997b
 
-/////////////////////////// subroutines
-  
+	/////////////////////////// strings
 
 	DMA_DETECTED:   		.asciz "DMA device detected!\n\r"
 	DMA_READ_BEGIN: 		.asciz "Probing the fw_cfg file directory through the DMA interface.\n\r"
 	DMA_READ_NUM_FILES:		.asciz "Found nr of files: "
 	EXAMPLE_STRING: .asciz "Hello, world!\n\r"
 	PLEASE_WRITE:   .asciz "Please input a key and I'll do my best to repeat it and tell you if it's odd or even: "
-	RAMFB_INITIALISED: 		.asciz "Framebuffer initialised. Current dimensions (x, y, bpp): "
+	RAMFB_INITIALISED: 		.asciz "Framebuffer initialised. Current dimensions (x, y, bpp): 1024, 768, 4bpp"
 
 	.align 8
+
+	/////////////////////// functions and subroutines
+
+	/*
+		draw pixel
+		takes 3 args on stack, returns 0
+		trashes 5 registers
+	*/
+	_drawpx:
+		stp x0, x1, [sp, -16]!
+		stp x2, x3, [sp, -16]!
+		str x4, [sp, -8]!
+
+		ldr x0, =ramfb_bottom
+
+		ldr  w1, [sp, 40] // colour
+		ldr  w2, [sp, 44] // y
+		ldr  w3, [sp, 48] // x
+
+		mov  w4, 1024
+
+		madd w2, w2, w4, w3
+		lsl  w2, w2, 2
+		add  x0, x0, x2
+
+		str w1, [x0]
+
+		ldr x4, [sp], 8
+		ldp x2, x3, [sp], 16
+		ldp x0, x1, [sp], 16
+		add sp, sp, 12
+	ret
 
 	// our print function
 	// takes 1 arg on stack, returns 0
@@ -624,7 +674,6 @@
 		ldp x2, x30, [sp], 16
 		ldp x0, x1,  [sp], 16
 		add sp, sp, 8
-
 	ret
 
 	// our input function
@@ -651,7 +700,6 @@
 		str  x0, [sp, 16]
 		ldp  x0, x1, [sp, 16]!
 		ret
-
 
 ///////////////////////////////////////////////
 /// RNG function
