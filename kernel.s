@@ -478,7 +478,10 @@
 	ldr x20, =TEMPLATE_TEST_STRING
 	ldr x21, =EXAMPLE_STRING
 
-	psh x21
+	mov w22, 0x34fa
+
+	psh x22
+	bl  _i2hex_w
 	psh x21
 	psh x21
 	psh x20
@@ -532,6 +535,48 @@
 		ldp x0, x1, [sp], 16
 		add sp, sp, 12
 	ret
+
+	/*
+	*	int to hex
+	*	takes a 4-byte number on the stack
+	*	returns an 8-byte 8-char string representation
+	*/
+	_i2hex_w:
+		psh2 x0, x1
+		psh2 x2, x3
+		psh2 x4, x5
+
+		ldr x0, [sp, 48]
+		mov x3, 8
+		mov x4, 0x3a
+
+		_i2hex_w_loop:
+			cbz  x1, _i2hex_w_loop_end
+			and  x1, x0, 0xf
+			lsr  x0, x0, 4
+			add  x1, x1, 0x30
+			cmp  x1, x4
+			b.lt _i2hex_w_loop_skip
+
+			add  x1, x1, 0x27
+
+			_i2hex_w_loop_skip:
+
+			orr  x2, x2, x1
+			lsl  x2, x2, 4
+
+		_i2hex_w_loop_end:
+
+		rev x2, x2
+		lsl x2, x2, 4
+
+		str x2, [sp, 48]
+
+		pop2 x4, x5
+		pop2 x2, x3
+		pop2 x0, x1
+	ret
+
 
 	/*
 		templated print
