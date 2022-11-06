@@ -615,7 +615,8 @@
 
 			// yes it is
 
-			psh x2
+			ldr x0, [x2]
+			psh x0
 			add x2, x2, 8
 			bl  _uputs
 
