@@ -596,115 +596,44 @@
 		broken currently
 	*/
 	_ufputs:
-		stp x0, x1,  [sp, -16]!
-		stp x2, x30, [sp, -16]!
-		stp x3, x4,  [sp, -16]!
-		ldr x0, [sp, 48]    // the string address	
+		psh2 x0, x1
+		psh2 x2, x3
+		psh2 x4, x30
 
-		mov x3, 0x40
-		add x4, sp, 56      // first substring
+		add x0, sp, 48     // base address
+		add x1, x0, 0      // get the address of the first string
+		add x2, x0, 8      // address of first insertion string
+
+		mov w4, 0x40
 
 		_ufputs_loop1:
-			ldr x1, [x0]                  // the initial memory read
-			cbz x1, _ufputs_loop1_end
 
-			and x2, x1, 0xff              // extract byte
-			cbz x2, _ufputs_loop1_end
-			cmp x2, x3
-			ldr x30, =_ufputs_loop_chkpt_0
-			b.eq 	_ufputs_found_at
-			_ufputs_loop_chkpt_0:
-			eor x2, x2, x2
-			str x2, [sp, -8]!
-			bl  _uputc 
+			ldrb w3, [x1]
+			add  x1, x1, 1
+			cbz  w3, _ufputs_loop1_end
+			cmp  w3, w4
+			b.ne _ufputs_loop1_skip // is it 0x40 = '@'?
 
-			asr x1, x1, 8
-			and x2, x1, 0xff
-			cbz x2, _ufputs_loop1_end
-			cmp x2, x3
-			ldr x30, =_ufputs_loop_chkpt_1
-			b.eq 	_ufputs_found_at
-			_ufputs_loop_chkpt_1:
-			eor x2, x2, x2
-			str x2, [sp, -8]!
-			bl  _uputc 
+			// yes it is
 
-			asr x1, x1, 8
-			cbz x2, _ufputs_loop1_end
-			cmp x2, x3
-			ldr x30, =_ufputs_loop_chkpt_2
-			b.eq 	_ufputs_found_at
-			_ufputs_loop_chkpt_2:
-			eor x2, x2, x2
-			str x2, [sp, -8]!
-			bl  _uputc 
-
-			asr x1, x1, 8
-			cbz x2, _ufputs_loop1_end
-			cmp x2, x3
-			ldr x30, =_ufputs_loop_chkpt_3
-			b.eq 	_ufputs_found_at
-			_ufputs_loop_chkpt_3:
-			eor x2, x2, x2
-			str x2, [sp, -8]!
-			bl  _uputc 
-
-			asr x1, x1, 8
-			cbz x2, _ufputs_loop1_end
-			cmp x2, x3
-			ldr x30, =_ufputs_loop_chkpt_4
-			b.eq 	_ufputs_found_at
-			_ufputs_loop_chkpt_4:
-			eor x2, x2, x2
-			str x2, [sp, -8]!
-			bl  _uputc 
-
-			asr x1, x1, 8
-			cbz x2, _ufputs_loop1_end
-			cmp x2, x3
-			ldr x30, =_ufputs_loop_chkpt_5
-			b.eq 	_ufputs_found_at
-			_ufputs_loop_chkpt_5:
-			eor x2, x2, x2
-			str x2, [sp, -8]!
-			bl  _uputc 
-
-			asr x1, x1, 8
-			cbz x2, _ufputs_loop1_end
-			cmp x2, x3
-			ldr x30, =_ufputs_loop_chkpt_6
-			b.eq 	_ufputs_found_at
-			_ufputs_loop_chkpt_6:
-			eor x2, x2, x2
-			str x2, [sp, -8]!
-			bl  _uputc 
-
-			asr x1, x1, 8
-			cbz x2, _ufputs_loop1_end
-			cmp x2, x3
-			ldr x30, =_ufputs_loop_chkpt_7
-			b.eq 	_ufputs_found_at
-			_ufputs_loop_chkpt_7:
-			eor x2, x2, x2
-			str x2, [sp, -8]!
-			bl  _uputc 
-
-			add x0, x0, 8             // shift pointer by 8, and loop
+			add x2, x2, 8
+			psh x2
+			bl  _uputs
 
 			b _ufputs_loop1
 
-		_ufputs_found_at:
-			psh x4
-			add x4, x4, 8
-			bl _uputs
-			ret
+			_ufputs_loop1_skip: // no it isn't
+
+			psh x3
+			bl  _uputc
+			b _ufputs_loop1
 
 		_ufputs_loop1_end:
 
-		ldp x3, x4,  [sp], 16
-		ldp x2, x30, [sp], 16
-		ldp x0, x1,  [sp], 16
-		add sp, sp, 8
+		pop2 x4, x30
+		pop2 x2, x3
+		pop2 x0, x1
+
 	ret
 
 	// our print function
