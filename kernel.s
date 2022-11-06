@@ -486,68 +486,14 @@
 	add sp, sp, 24
 
 	997:
-
 		b .
-
-	998:
-
-		bl _rng_64
-		ldr x0, [sp], 8
-		and x0, x0, 0xff
-		str x0, [sp, -8]!
-		bl _uputc
-
-		ldr x2, =EXAMPLE_STRING
-		str x2, [sp, -8]!
-		bl _uputs
-		// and Hello World, finally!
-
-		ldr x2, =PLEASE_WRITE
-		str x2, [sp, -8]!
-		bl _uputs
-
-		_parity_loop:
-			bl  _ugetc
-			ldr x2, [sp]
-			and x2, x2, 0xff
-
-			sub x2, x2, 0x40
-			cbz x2, 999f
-			add x2, x2, 0x40
-
-			bl  _uputc
-			
-			sub x2, x2, 0x30
-			and x2, x2, 0x1
-			cbz x2, _is_even
-		
-				_is_odd:
-				mov x2, 0x4f
-				b _parity_loop_end
-
-				_is_even:
-				mov x2, 0x45
-
-			_parity_loop_end:
-			str x2, [sp, -8]!
-			bl _uputc
-			b  _parity_loop
-
-	999:
-		add x2, x2, 0x40
-		str x2, [sp, -8]!
-		bl _uputc
-		b .
-
-	1000:
-		b 997b
 
 	/////////////////////////// strings
 
 	DMA_DETECTED:   		.asciz "DMA device detected!\n\r"
 	DMA_READ_BEGIN: 		.asciz "Probing the fw_cfg file directory through the DMA interface.\n\r"
 	DMA_READ_NUM_FILES:		.asciz "Found nr of files: "
-	EXAMPLE_STRING:         .asciz "Hello, world!\n\r"
+	EXAMPLE_STRING:         .asciz "ABC"
 	PLEASE_WRITE:           .asciz "Please input a key and I'll do my best to repeat it and tell you if it's odd or even: "
 	RAMFB_INITIALISED: 		.asciz "Framebuffer initialised. Current dimensions (x, y, bpp): 1024, 768, 4bpp"
 

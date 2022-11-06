@@ -197,3 +197,56 @@
 
 		//mov x6, xzr
 		//ldr x6, =0x58523234 // 'XR24' in bytes
+
+	998:
+
+		bl _rng_64
+		ldr x0, [sp], 8
+		and x0, x0, 0xff
+		str x0, [sp, -8]!
+		bl _uputc
+
+		ldr x2, =EXAMPLE_STRING
+		str x2, [sp, -8]!
+		bl _uputs
+		// and Hello World, finally!
+
+		ldr x2, =PLEASE_WRITE
+		str x2, [sp, -8]!
+		bl _uputs
+
+		_parity_loop:
+			bl  _ugetc
+			ldr x2, [sp]
+			and x2, x2, 0xff
+
+			sub x2, x2, 0x40
+			cbz x2, 999f
+			add x2, x2, 0x40
+
+			bl  _uputc
+			
+			sub x2, x2, 0x30
+			and x2, x2, 0x1
+			cbz x2, _is_even
+		
+				_is_odd:
+				mov x2, 0x4f
+				b _parity_loop_end
+
+				_is_even:
+				mov x2, 0x45
+
+			_parity_loop_end:
+			str x2, [sp, -8]!
+			bl _uputc
+			b  _parity_loop
+
+	999:
+		add x2, x2, 0x40
+		str x2, [sp, -8]!
+		bl _uputc
+		b .
+
+	1000:
+		b 997b
