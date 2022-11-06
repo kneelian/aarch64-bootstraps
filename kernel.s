@@ -2,7 +2,7 @@
 	.global _Reset
 	_Reset:
 	    b 1f
-	    .skip 8
+	    .skip 64
 
 	UART_BASE: .word 0x09000000
 //	UART_DATA: .byte 0x00
@@ -475,6 +475,17 @@
 	str w2, [sp, -4]!
 	bl _drawpx
 
+	ldr x20, =TEMPLATE_TEST_STRING
+	ldr x21, =EXAMPLE_STRING
+	mov x22, 3
+
+	psh x21
+	psh x21
+	psh x21
+	psh x20
+	bl _ufputs
+	add sp, sp, 24
+
 	997:
 
 		b .
@@ -537,9 +548,11 @@
 	DMA_DETECTED:   		.asciz "DMA device detected!\n\r"
 	DMA_READ_BEGIN: 		.asciz "Probing the fw_cfg file directory through the DMA interface.\n\r"
 	DMA_READ_NUM_FILES:		.asciz "Found nr of files: "
-	EXAMPLE_STRING: .asciz "Hello, world!\n\r"
-	PLEASE_WRITE:   .asciz "Please input a key and I'll do my best to repeat it and tell you if it's odd or even: "
+	EXAMPLE_STRING:         .asciz "Hello, world!\n\r"
+	PLEASE_WRITE:           .asciz "Please input a key and I'll do my best to repeat it and tell you if it's odd or even: "
 	RAMFB_INITIALISED: 		.asciz "Framebuffer initialised. Current dimensions (x, y, bpp): 1024, 768, 4bpp"
+
+	TEMPLATE_TEST_STRING:   .asciz "Test @ @ @ Test!"
 
 	.align 8
 
@@ -573,6 +586,125 @@
 		ldp x2, x3, [sp], 16
 		ldp x0, x1, [sp], 16
 		add sp, sp, 12
+	ret
+
+	/*
+		templated print
+		takes pointer to structure on stack
+		returns 0
+
+		broken currently
+	*/
+	_ufputs:
+		stp x0, x1,  [sp, -16]!
+		stp x2, x30, [sp, -16]!
+		stp x3, x4,  [sp, -16]!
+		ldr x0, [sp, 48]    // the string address	
+
+		mov x3, 0x40
+		add x4, sp, 56      // first substring
+
+		_ufputs_loop1:
+			ldr x1, [x0]                  // the initial memory read
+			cbz x1, _ufputs_loop1_end
+
+			and x2, x1, 0xff              // extract byte
+			cbz x2, _ufputs_loop1_end
+			cmp x2, x3
+			ldr x30, =_ufputs_loop_chkpt_0
+			b.eq 	_ufputs_found_at
+			_ufputs_loop_chkpt_0:
+			eor x2, x2, x2
+			str x2, [sp, -8]!
+			bl  _uputc 
+
+			asr x1, x1, 8
+			and x2, x1, 0xff
+			cbz x2, _ufputs_loop1_end
+			cmp x2, x3
+			ldr x30, =_ufputs_loop_chkpt_1
+			b.eq 	_ufputs_found_at
+			_ufputs_loop_chkpt_1:
+			eor x2, x2, x2
+			str x2, [sp, -8]!
+			bl  _uputc 
+
+			asr x1, x1, 8
+			cbz x2, _ufputs_loop1_end
+			cmp x2, x3
+			ldr x30, =_ufputs_loop_chkpt_2
+			b.eq 	_ufputs_found_at
+			_ufputs_loop_chkpt_2:
+			eor x2, x2, x2
+			str x2, [sp, -8]!
+			bl  _uputc 
+
+			asr x1, x1, 8
+			cbz x2, _ufputs_loop1_end
+			cmp x2, x3
+			ldr x30, =_ufputs_loop_chkpt_3
+			b.eq 	_ufputs_found_at
+			_ufputs_loop_chkpt_3:
+			eor x2, x2, x2
+			str x2, [sp, -8]!
+			bl  _uputc 
+
+			asr x1, x1, 8
+			cbz x2, _ufputs_loop1_end
+			cmp x2, x3
+			ldr x30, =_ufputs_loop_chkpt_4
+			b.eq 	_ufputs_found_at
+			_ufputs_loop_chkpt_4:
+			eor x2, x2, x2
+			str x2, [sp, -8]!
+			bl  _uputc 
+
+			asr x1, x1, 8
+			cbz x2, _ufputs_loop1_end
+			cmp x2, x3
+			ldr x30, =_ufputs_loop_chkpt_5
+			b.eq 	_ufputs_found_at
+			_ufputs_loop_chkpt_5:
+			eor x2, x2, x2
+			str x2, [sp, -8]!
+			bl  _uputc 
+
+			asr x1, x1, 8
+			cbz x2, _ufputs_loop1_end
+			cmp x2, x3
+			ldr x30, =_ufputs_loop_chkpt_6
+			b.eq 	_ufputs_found_at
+			_ufputs_loop_chkpt_6:
+			eor x2, x2, x2
+			str x2, [sp, -8]!
+			bl  _uputc 
+
+			asr x1, x1, 8
+			cbz x2, _ufputs_loop1_end
+			cmp x2, x3
+			ldr x30, =_ufputs_loop_chkpt_7
+			b.eq 	_ufputs_found_at
+			_ufputs_loop_chkpt_7:
+			eor x2, x2, x2
+			str x2, [sp, -8]!
+			bl  _uputc 
+
+			add x0, x0, 8             // shift pointer by 8, and loop
+
+			b _ufputs_loop1
+
+		_ufputs_found_at:
+			psh x4
+			add x4, x4, 8
+			bl _uputs
+			ret
+
+		_ufputs_loop1_end:
+
+		ldp x3, x4,  [sp], 16
+		ldp x2, x30, [sp], 16
+		ldp x0, x1,  [sp], 16
+		add sp, sp, 8
 	ret
 
 	// our print function
