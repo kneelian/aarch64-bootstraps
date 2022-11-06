@@ -477,7 +477,6 @@
 
 	ldr x20, =TEMPLATE_TEST_STRING
 	ldr x21, =EXAMPLE_STRING
-	mov x22, 3
 
 	psh x21
 	psh x21
@@ -600,11 +599,11 @@
 		psh2 x2, x3
 		psh2 x4, x30
 
-		add x0, sp, 48     // base address
-		add x1, x0, 0      // get the address of the first string
-		add x2, x0, 8      // address of first insertion string
+		add x0, sp, 48   // address of first string address 
+		ldr x1, [x0]     // start of first string
+		add x2, x0, 8    // first substring
 
-		mov w4, 0x40
+		mov w4, 0x40     // '@'
 
 		_ufputs_loop1:
 
@@ -616,8 +615,8 @@
 
 			// yes it is
 
-			add x2, x2, 8
 			psh x2
+			add x2, x2, 8
 			bl  _uputs
 
 			b _ufputs_loop1
