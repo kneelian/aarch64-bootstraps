@@ -16,6 +16,31 @@
 // the operations slightly easier
 // to write
 
+.macro clr reg
+	eor \reg, \reg, \reg
+.endm
+
+.macro clr2 rega regb
+	eor \rega, \rega, \rega
+	eor \regb, \regb, \regb
+.endm
+
+.macro clr4 rega regb regc regd
+	eor \rega, \rega, \rega
+	eor \regb, \regb, \regb
+	eor \regc, \regc, \regc
+	eor \regd, \regd, \regd
+.endm
+
+.macro mod rega regb temp
+	psh \temp
+
+	udiv \temp, \rega, \regb
+	msub \rega, \temp, \regb, \rega
+
+	pop \temp
+.endm
+
 .macro psh reg 
 	str \reg, [sp, #-8]!
 .endm
