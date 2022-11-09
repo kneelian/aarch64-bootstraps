@@ -504,6 +504,11 @@
 	clr x2
 	mod x0, x1, x2
 
+	mov x0, 41240
+	psh x0
+	bl  _i2dec_w
+	pop x25
+
 	997:
 		b .
 
@@ -561,16 +566,26 @@
 		mov x1, 10
 
 		_i2dec_w_loop:
+			cbz x0, _i2dec_w_loop_end
+			mov x2, x0
+
+			mod x2, x1, x3 // dont forget this isnt the standard arm insn format!
+			add x2, x2, 0x30
+
+			orr  x4, x4, x2
+			lsl  x4, x4, 8
+			udiv x0, x0, x1
+
+			b _i2dec_w_loop
 
 		_i2dec_w_loop_end:
+
+		str x4, [sp, 48]
 
 		pop2 x4, x5
 		pop2 x2, x3 
 		pop2 x0, x1
-
 		ret
-
-
 	/*
 	*	int to hex
 	*	takes a 4-byte number on the stack
