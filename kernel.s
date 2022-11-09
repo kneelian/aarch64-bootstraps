@@ -374,26 +374,12 @@
 			the big endian address is in x2
 		*/
 
-		eor x0, x0, x0
-		eor x1, x1, x1
-		eor x2, x2, x2
-		eor x3, x3, x3
-		eor x4, x4, x4
-		eor x5, x5, x5
-		eor x6, x6, x6
-		eor x7, x7, x7
-		eor x8, x8, x8
-		eor x9, x9, x9
-		eor x11, x11, x11
-		eor x13, x13, x13
-		eor x14, x14, x14
-		eor x15, x15, x15
-		eor x16, x16, x16
-		eor x17, x17, x17
-		eor x18, x18, x18
-		eor x19, x19, x19
-		eor x20, x20, x20
-		eor x30, x30, x30
+		clr4 x0, x1, x2, x3
+		clr4 x4, x5, x6, x7
+		clr4 x8, x9, x10, x11
+		clr4 x13, x14, x15, x16
+		clr4 x17, x18, x19, x20
+		clr x30
 
 		///
 
@@ -506,12 +492,17 @@
 	mov w22, 0x34fa
 
 	psh x22
-	bl  _i2hex_w
+	// bl  _i2hex_w
 	psh x21
 	psh x21
 	psh x20
 	bl _ufputs
 	add sp, sp, 24
+
+	mov x0, 47
+	mov x1, 10
+	clr x2
+	mod x0, x1, x2
 
 	997:
 		b .
@@ -560,6 +551,25 @@
 		ldp x0, x1, [sp], 16
 		add sp, sp, 12
 	ret
+
+	_i2dec_w:
+		psh2 x0, x1
+		psh2 x2, x3
+		psh2 x4, x5
+
+		ldr x0, [sp, 48]
+		mov x1, 10
+
+		_i2dec_w_loop:
+
+		_i2dec_w_loop_end:
+
+		pop2 x4, x5
+		pop2 x2, x3 
+		pop2 x0, x1
+
+		ret
+
 
 	/*
 	*	int to hex
