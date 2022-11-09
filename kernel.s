@@ -533,9 +533,9 @@
 		trashes 5 registers
 	*/
 	_drawpx:
-		stp x0, x1, [sp, -16]!
-		stp x2, x3, [sp, -16]!
-		str x4, [sp, -8]!
+		psh2 x0, x1
+		psh2 x2, x3
+		psh  x4
 
 		ldr x0, =ramfb_bottom
 
@@ -551,9 +551,9 @@
 
 		str w1, [x0]
 
-		ldr x4, [sp], 8
-		ldp x2, x3, [sp], 16
-		ldp x0, x1, [sp], 16
+		pop  x4
+		pop2 x2, x3
+		pop2 x0, x1 
 		add sp, sp, 12
 	ret
 
@@ -712,8 +712,8 @@
 	// takes 1 arg on stack, returns 0
 	// trashes 4 registers
 	_uputs:
-		stp x0, x1,  [sp, -16]!
-		stp x2, x30, [sp, -16]!
+		psh2 x0, x1
+		psh2 x2, x30
 		ldr x0, [sp, 32]    // the string address	
 
 		_uputs_loop1:
@@ -722,49 +722,49 @@
 
 			and x2, x1, 0xff              // extract byte
 			cbz x2, _uputs_loop1_end
-			str x2, [sp, -8]!
+			psh x2
 			bl  _uputc 
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			str x2, [sp, -8]!
+			psh x2
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			str x2, [sp, -8]!
+			psh x2
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			str x2, [sp, -8]!
+			psh x2
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			str x2, [sp, -8]!
+			psh x2
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			str x2, [sp, -8]!
+			psh x2
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			str x2, [sp, -8]!
+			psh x2
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			str x2, [sp, -8]!
+			psh x2
 			bl  _uputc
 
 			add x0, x0, 8             // shift pointer by 8, and loop
@@ -773,8 +773,8 @@
 
 		_uputs_loop1_end:
 
-		ldp x2, x30, [sp], 16
-		ldp x0, x1,  [sp], 16
+		pop2 x2, x30
+		pop2 x0, x1
 		add sp, sp, 8
 	ret
 
@@ -782,8 +782,8 @@
 	// takes 0 arg on stack, returns 1
 	// trashes 2 registers
 	_ugetc:
-		str  xzr, [sp, -8]!
-		stp  x0, x1, [sp, -16]!
+		psh xzr
+		psh2 x0, x1
 		
 		adrp x0, UART_BASE
 		add  x0, x0, :lo12:UART_BASE
@@ -800,7 +800,7 @@
 		sub  x0, x0, 0x18
 		ldr  x0, [x0]
 		str  x0, [sp, 16]
-		ldp  x0, x1, [sp, 16]!
+		pop2 x0, x1
 		ret
 
 ///////////////////////////////////////////////
