@@ -454,7 +454,7 @@
 	mov x20, 1024
 	mov x21, 768
 	mul x20, x20, x21
-	eor x21, x21, x21
+	clr x21 
 	rev x22, x6
 
 	framebuffer_example:
@@ -811,8 +811,8 @@
 
 	_rng_64_branch: .quad _rng_64_fallback
 	 	_rng_64:
-	 		sub sp, sp, 8
-	 		str x0, [sp, -8]!
+	 		psh2 xzr, x0
+
 	 		adr x0, _rng_64_branch
 	 		ldr x0, [x0]
 	 		br  x0
@@ -824,6 +824,6 @@
 	 		ret
 	 	_rng_64_fallback:
 	 		mov x0, 0
-	 		ldr x0, [sp], 8
+	 		pop x30
 	 		
 	 		ret
