@@ -226,7 +226,7 @@
         str x30, [sp, -8]!
         bl  _uputs
 
-       /*ldr  x2, =heap_bottom
+        /*ldr  x2, =heap_bottom
         rev  x1, x1
         str  x1, [x2]
         rev  x1, x1 
@@ -235,10 +235,10 @@
 
 		mov x15, x0 
 		mov x18, x1
-		mov x21, x2*/
+		mov x21, x2
 
 		cmp  x1, x2
-		bne  997f
+		bne  997f*/
 
 		// if we're in this code path this means that the DMA is enabled
 		// and that we can set up the framebuffer now.
@@ -376,7 +376,7 @@
 
 		clr4 x0, x1, x2, x3
 		clr4 x4, x5, x6, x7
-		clr4 x8, x9, x10, x11
+		clr4 x8, x9, x10, x11		// do not clear x12
 		clr4 x13, x14, x15, x16
 		clr4 x17, x18, x19, x20
 		clr x30
@@ -565,6 +565,8 @@
 		ldr x0, [sp, 48]
 		mov x1, 10
 
+		psh xzr
+
 		_i2dec_w_loop:
 			cbz x0, _i2dec_w_loop_end
 			mov x2, x0
@@ -572,15 +574,23 @@
 			mod x2, x1, x3 // dont forget this isnt the standard arm insn format!
 			add x2, x2, 0x30
 
-			orr  x4, x4, x2
-			lsl  x4, x4, 8
+			psh x2
+
 			udiv x0, x0, x1
 
 			b _i2dec_w_loop
-
 		_i2dec_w_loop_end:
 
-		str x4, [sp, 48]
+		_i2dec_w_loop_2:
+			pop x4
+			cbz x4, _i2dec_w_loop_2_end
+
+			add x3, x3, x4
+			lsr x3, x3, 8
+
+		_i2dec_w_loop_2_end:
+
+		str x3, [sp, 48]
 
 		pop2 x4, x5
 		pop2 x2, x3 
