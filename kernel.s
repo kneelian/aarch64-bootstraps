@@ -235,10 +235,10 @@
 
 		mov x15, x0 
 		mov x18, x1
-		mov x21, x2
+		mov x21, x2*/
 
 		cmp  x1, x2
-		bne  997f*/
+		bne  997f
 
 		// if we're in this code path this means that the DMA is enabled
 		// and that we can set up the framebuffer now.
@@ -595,7 +595,7 @@
 		pop2 x4, x5
 		pop2 x2, x3 
 		pop2 x0, x1
-		ret
+	ret
 	/*
 	*	int to hex
 	*	takes a 4-byte number on the stack
@@ -722,8 +722,8 @@
 	// takes 1 arg on stack, returns 0
 	// trashes 4 registers
 	_uputs:
-		psh2 x0, x1
-		psh2 x2, x30
+		stp x0, x1,  [sp, -16]!
+		stp x2, x30, [sp, -16]!
 		ldr x0, [sp, 32]    // the string address	
 
 		_uputs_loop1:
@@ -732,49 +732,49 @@
 
 			and x2, x1, 0xff              // extract byte
 			cbz x2, _uputs_loop1_end
-			psh x2
+			str x2, [sp, -8]!
 			bl  _uputc 
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			psh x2
+			str x2, [sp, -8]!
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			psh x2
+			str x2, [sp, -8]!
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			psh x2
+			str x2, [sp, -8]!
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			psh x2
+			str x2, [sp, -8]!
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			psh x2
+			str x2, [sp, -8]!
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			psh x2
+			str x2, [sp, -8]!
 			bl  _uputc
 
 			asr x1, x1, 8
 			and x2, x1, 0xff
 			cbz x2, _uputs_loop1_end
-			psh x2
+			str x2, [sp, -8]!
 			bl  _uputc
 
 			add x0, x0, 8             // shift pointer by 8, and loop
@@ -783,8 +783,8 @@
 
 		_uputs_loop1_end:
 
-		pop2 x2, x30
-		pop2 x0, x1
+		ldp x2, x30, [sp], 16
+		ldp x0, x1,  [sp], 16
 		add sp, sp, 8
 	ret
 
