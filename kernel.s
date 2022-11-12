@@ -5,16 +5,6 @@
 	    .skip 64
 
 	UART_BASE: .word 0x09000000
-//	UART_DATA: .byte 0x00
-//	UART_FLAG: .byte 0x18
-//	UART_CNTL: .byte 0x30
-//	UART_FIFO: .byte 0x34
-//	UART_INTC: .byte 0x44
-
-// we want to add a macro for 
-// pushing and popping, to make
-// the operations slightly easier
-// to write
 
 .macro clr reg
 	eor \reg, \reg, \reg
@@ -51,12 +41,10 @@
 
 .macro pop reg
 	ldr \reg, [sp], 8
-	add sp, sp, 8
 .endm
 
 .macro pop2 rega regb
 	ldp \rega, \regb, [sp], 16
-	add sp, sp, 16
 .endm
 
 // also adding a macro to 
@@ -226,7 +214,7 @@
         str x30, [sp, -8]!
         bl  _uputs
 
-        /*ldr  x2, =heap_bottom
+       /*ldr  x2, =heap_bottom
         rev  x1, x1
         str  x1, [x2]
         rev  x1, x1 
@@ -379,7 +367,7 @@
 		clr4 x8, x9, x10, x11		// do not clear x12
 		clr4 x13, x14, x15, x16
 		clr4 x17, x18, x19, x20
-		clr x30
+		clr  x30
 
 		///
 
