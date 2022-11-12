@@ -309,8 +309,8 @@
 		ldr x30, =DMA_READ_NUM_FILES
 		str x30, [sp, -8]!
 		bl  _uputs
-		add x30, x6, 0x30
-		str x30, [sp, -8]!
+		psh x6
+		bl  _digit2hexchar
 		bl  _uputc
 		mov x30, 0xa
 		str x30, [sp, -8]!
@@ -505,7 +505,7 @@
 	mov x0, 41240
 	psh x0
 	bl  _i2dec_w
-	pop x25
+	pop x0
 
 	997:
 		b .
@@ -514,7 +514,7 @@
 
 	DMA_DETECTED:   		.asciz "DMA device detected!\n\r"
 	DMA_READ_BEGIN: 		.asciz "Probing the fw_cfg file directory through the DMA interface.\n\r"
-	DMA_READ_NUM_FILES:		.asciz "Found nr of files: "
+	DMA_READ_NUM_FILES:		.asciz "Found nr of files: 0x"
 	EXAMPLE_STRING:         .asciz "ABC"
 	PLEASE_WRITE:           .asciz "Please input a key and I'll do my best to repeat it and tell you if it's odd or even: "
 	RAMFB_INITIALISED: 		.asciz "Framebuffer initialised. Current dimensions (x, y, bpp): 1024, 768, 4bpp"
@@ -555,6 +555,8 @@
 		add sp, sp, 12
 	ret
 
+	/* broken */
+
 	_i2dec_w:
 		psh2 x0, x1
 		psh2 x2, x3
@@ -562,6 +564,8 @@
 
 		ldr x0, [sp, 48]
 		mov x1, 10
+
+		clr x29
 
 		psh xzr
 
@@ -575,6 +579,8 @@
 			psh x2
 
 			udiv x0, x0, x1
+
+			add x29, x29, 1
 
 			b _i2dec_w_loop
 		_i2dec_w_loop_end:
@@ -594,10 +600,32 @@
 		pop2 x2, x3 
 		pop2 x0, x1
 		ret
+	
+	/* get single int turn to char */
+
+	_digit2hexchar:
+	psh2 x0, x1
+
+	ldr x0, [sp, 16]
+	mov x1, 0x3a
+	add  x0, x0, 0x30
+	cmp  x0, x1
+	b.lt _digit2hexchar_skip
+	
+	add  x0, x0, 0x7
+
+	_digit2hexchar_skip:
+
+	str  x0, [sp, 16]
+	pop2 x0, x1
+	ret
+
 	/*
 	*	int to hex
 	*	takes a 4-byte number on the stack
 	*	returns an 8-byte 8-char string representation
+	*
+	*	broken
 	*/
 	_i2hex_w:
 		psh2 x0, x1
