@@ -627,7 +627,7 @@
 	*	takes a 4-byte number on the stack
 	*	returns an 8-byte 8-char string representation
 	*
-	*	broken
+	*	working!
 	*/
 	_i2hex_w:
 		psh2 x0, x1
@@ -674,7 +674,7 @@
 		takes pointer to structure on stack
 		returns 0
 
-		broken currently
+		working!
 	*/
 	_ufputs:
 		psh2 x0, x1
