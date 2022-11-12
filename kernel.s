@@ -487,10 +487,16 @@
 	ldr x20, =TEMPLATE_TEST_STRING
 	ldr x21, =EXAMPLE_STRING
 
-	mov w22, 0x34fa
+	mov x0, 0xf0fe
+	psh x0
+	bl  _i2hex_w
+	pop x0
+	rev32 x0, x0
+	ldr x1, =heap_bottom
+	str x0, [x1]
 
-	psh x22
-	// bl  _i2hex_w
+
+	psh x1
 	psh x21
 	psh x21
 	psh x20
@@ -502,9 +508,9 @@
 	clr x2
 	mod x0, x1, x2
 
-	mov x0, 41240
+	mov x0, 0xf0f0
 	psh x0
-	bl  _i2dec_w
+	bl  _i2hex_w
 	pop x0
 
 	997:
@@ -570,21 +576,17 @@
 		psh xzr
 
 		_i2dec_w_loop:
-			cbz x0, _i2dec_w_loop_end
+			cbz x0, _i2dec_w_loop_2
 			mov x2, x0
 
 			mod x2, x1, x3 // dont forget this isnt the standard arm insn format!
 			add x2, x2, 0x30
 
 			psh x2
-
 			udiv x0, x0, x1
-
 			add x29, x29, 1
 
 			b _i2dec_w_loop
-		_i2dec_w_loop_end:
-
 		_i2dec_w_loop_2:
 			pop x4
 			cbz x4, _i2dec_w_loop_2_end
@@ -604,20 +606,20 @@
 	/* get single int turn to char */
 
 	_digit2hexchar:
-	psh2 x0, x1
+		psh2 x0, x1
 
-	ldr x0, [sp, 16]
-	mov x1, 0x3a
-	add  x0, x0, 0x30
-	cmp  x0, x1
-	b.lt _digit2hexchar_skip
-	
-	add  x0, x0, 0x7
+		ldr x0, [sp, 16]
+		mov x1, 0x3a
+		add  x0, x0, 0x30
+		cmp  x0, x1
+		b.lt _digit2hexchar_skip
+		
+		add  x0, x0, 0x7
 
-	_digit2hexchar_skip:
+		_digit2hexchar_skip:
 
-	str  x0, [sp, 16]
-	pop2 x0, x1
+		str  x0, [sp, 16]
+		pop2 x0, x1
 	ret
 
 	/*
@@ -630,35 +632,38 @@
 	_i2hex_w:
 		psh2 x0, x1
 		psh2 x2, x3
-		psh2 x4, x5
+		psh2 x4, x30
 
-		ldr x0, [sp, 48]
-		mov x3, 8
-		mov x4, 0x3a
+		clr x4
+
+		ldr w0, [sp, 48]
+		mov w1, w0
+
+		psh xzr
 
 		_i2hex_w_loop:
-			cbz  x1, _i2hex_w_loop_end
-			and  x1, x0, 0xf
-			lsr  x0, x0, 4
-			add  x1, x1, 0x30
-			cmp  x1, x4
-			b.lt _i2hex_w_loop_skip
+			cbz w1, _i2hex_w_loop_2
+			and w2, w1, 0xf
+			lsr w1, w1, 4
 
-			add  x1, x1, 0x27
+			psh x2
+			bl  _digit2hexchar
+			b   _i2hex_w_loop
+		_i2hex_w_loop_2:
+			pop x3
+			cbz x3, _i2hex_w_loop_2_end
 
-			_i2hex_w_loop_skip:
+			orr x4, x4, x3
+			lsl x4, x4, 8
+			b   _i2hex_w_loop_2
 
-			orr  x2, x2, x1
-			lsl  x2, x2, 4
+		_i2hex_w_loop_2_end:
 
-		_i2hex_w_loop_end:
+		lsr x4, x4, 8 
 
-		rev x2, x2
-		lsl x2, x2, 4
+		str x4, [sp, 48]
 
-		str x2, [sp, 48]
-
-		pop2 x4, x5
+		pop2 x4, x30
 		pop2 x2, x3
 		pop2 x0, x1
 	ret
