@@ -668,7 +668,6 @@
 		pop2 x0, x1
 	ret
 
-
 	/*
 		templated print
 		takes pointer to structure on stack
