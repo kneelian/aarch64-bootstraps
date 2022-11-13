@@ -513,6 +513,15 @@
 	bl  _i2hex_w
 	pop x0
 
+	mov x0, 41420
+	psh x0
+	bl  _i2dec_w
+	pop x0
+	ldr x1, =heap_bottom
+	str x0, [x1]
+	psh x1
+	bl  _ufputs
+
 	997:
 		b .
 
@@ -566,12 +575,10 @@
 	_i2dec_w:
 		psh2 x0, x1
 		psh2 x2, x3
-		psh2 x4, x5
+		psh2 x4, x30
 
 		ldr x0, [sp, 48]
 		mov x1, 10
-
-		clr x29
 
 		psh xzr
 
@@ -579,12 +586,14 @@
 			cbz x0, _i2dec_w_loop_2
 			mov x2, x0
 
-			mod x2, x1, x3 // dont forget this isnt the standard arm insn format!
-			add x2, x2, 0x30
+			mod  x2, x1, x3 // dont forget this isnt the standard arm insn format!
+			udiv x0, x0, x1
+			add  x2, x2, 0x30
 
 			psh x2
+			bl  _digit2decchar
+
 			udiv x0, x0, x1
-			add x29, x29, 1
 
 			b _i2dec_w_loop
 		_i2dec_w_loop_2:
@@ -598,7 +607,7 @@
 
 		str x3, [sp, 48]
 
-		pop2 x4, x5
+		pop2 x4, x30
 		pop2 x2, x3 
 		pop2 x0, x1
 		ret
@@ -621,6 +630,15 @@
 		str  x0, [sp, 16]
 		pop2 x0, x1
 	ret
+
+	_digit2decchar:
+		psh x0
+		ldr x0, [sp, 16]
+		add x0, x0, 0x30
+		str x0, [sp, 16]
+		pop x0
+	ret
+
 
 	/*
 	*	int to hex
@@ -721,7 +739,7 @@
 	// takes 1 arg on stack, returns 0
 	// trashes 2 registers
 	_uputc:
-		stp  x0, x1, [sp, -16]!
+		psh2 x0, x1
 		
 		adrp x0, UART_BASE
 		add  x0, x0, :lo12:UART_BASE
@@ -743,7 +761,7 @@
 	    ldr  x1, [sp, 16]
 	    str  x1, [x0]
 
-	    ldp  x0, x1, [sp], 16
+	    pop2 x0, x1
 	    add  sp, sp, 8         // pop the argument off the stack
 
 	    ret
