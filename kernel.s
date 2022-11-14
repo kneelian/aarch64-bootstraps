@@ -641,7 +641,7 @@
 		cmp  w3, w4
 		b.ne _strcompare_skip
 
-		sub  x2, xzr, 1 // in case the loop exits and w3 == w4, then w3 == 0, return -1
+		movn x2, 0 // in case the loop exits and w3 == w4, then w3 == 0, return -1
 
 		_strcompare_skip:
 
