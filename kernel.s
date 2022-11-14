@@ -25,6 +25,14 @@
 	eor \regb, \regb, \regb
 .endm
 
+.macro inc reg
+	add \reg, \reg, 1
+.endm
+
+.macro dec reg
+	sub \reg, \reg, 1
+.endm
+
 .macro clr4 rega regb regc regd
 	eor \rega, \rega, \rega
 	eor \regb, \regb, \regb
