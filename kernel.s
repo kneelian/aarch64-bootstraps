@@ -516,6 +516,8 @@
 	psh x1
 	bl  _ufputs
 
+
+
 	997:
 		b .
 
@@ -533,6 +535,70 @@
 	.align 8
 
 	/////////////////////// functions and subroutines
+
+	/*
+		copies memory to memory, single bytes
+		takes 3 args on stack, returns 0
+		trashes 4 registers
+	*/
+
+	_memcpy:
+		psh2 x0, x1
+		psh2 x2, x3
+
+		ldp x0, x1, [sp, 32]
+		ldr x2, [sp, 48]
+
+		/*
+			x0 -- number of bytes to copy
+			x1 -- destination of copy
+			x2 -- source of copy
+		*/
+
+		_memcpy_loop:
+			cbz  x0, _memcpy_loop_end
+			ldrb w3, [x2]
+			strb w3, [x1]
+			sub  x0, x0, 1
+			add  x1, x1, 1
+			add  x1, x1, 1
+		_memcpy_loop_end:
+
+		pop2 x2, x3 
+		pop2 x0, x1
+		ret
+
+	/*
+		copies memory to memory, 8 bytes at once
+		takes 3 args on stack, returns 0
+		trashes 4 registers
+	*/
+
+	_memcpy8:
+		psh2 x0, x1
+		psh2 x2, x3
+
+		ldp x0, x1, [sp, 32]
+		ldr x2, [sp, 48]
+
+		/*
+			x0 -- number of dwords to copy
+			x1 -- destination of copy
+			x2 -- source of copy
+		*/
+
+		_memcpy8_loop:
+			cbz  x0, _memcpy8_loop_end
+			ldr  x3, [x2]
+			str  x3, [x1]
+			sub  x0, x0, 1
+			add  x1, x1, 8
+			add  x1, x1, 8
+		_memcpy8_loop_end:
+
+		pop2 x2, x3 
+		pop2 x0, x1
+		ret
 
 	/*
 		draw pixel
@@ -556,7 +622,7 @@
 		lsl  w2, w2, 2
 		add  x0, x0, x2
 
-		str w1, [x0]
+		str  w1, [x0]
 
 		pop  x4
 		pop2 x2, x3
