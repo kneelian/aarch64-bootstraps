@@ -512,12 +512,6 @@
 	psh x0
 	bl  _i2hex_w
 	pop x0
-
-	mov x0, 41420
-	psh x0
-	bl  _i2dec_w
-	pop x0
-	ldr x1, =heap_bottom
 	str x0, [x1]
 	psh x1
 	bl  _ufputs
@@ -577,6 +571,44 @@
 		psh2 x2, x3
 		psh2 x4, x30
 
+		clr x4
+
+		mov w0, 10
+		ldr w1, [sp, 48]
+
+		psh xzr
+
+		_i2dec_w_loop:
+			cbz w1, _i2dec_w_loop_2
+			and w2, w1, 0xf
+			lsr w1, w1, 4
+
+			psh x2
+			bl  _digit2decchar
+			b   _i2dec_w_loop
+		_i2dec_w_loop_2:
+			pop x3
+			cbz x3, _i2dec_w_loop_2_end
+
+			orr x4, x4, x3
+			lsl x4, x4, 8
+			b   _i2dec_w_loop_2
+
+		_i2dec_w_loop_2_end:
+
+		//lsr x4, x4, 8 
+
+		str x4, [sp, 48]
+
+		pop2 x4, x30
+		pop2 x2, x3
+		pop2 x0, x1
+
+	/*
+		psh2 x0, x1
+		psh2 x2, x3
+		psh2 x4, x30
+
 		ldr x0, [sp, 48]
 		mov x1, 10
 
@@ -610,7 +642,7 @@
 		pop2 x4, x30
 		pop2 x2, x3 
 		pop2 x0, x1
-		ret
+		ret*/
 	
 	/* get single int turn to char */
 
