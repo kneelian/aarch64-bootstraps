@@ -514,7 +514,7 @@
 	pop x0
 	str x0, [x1]
 	psh x1
-	bl  _ufputs
+	bl  _ufputs 
 
 	997:
 		b .
@@ -529,6 +529,8 @@
 	RAMFB_INITIALISED: 		.asciz "Framebuffer initialised. Current dimensions (x, y, bpp): 1024, 768, 4bpp"
 
 	TEMPLATE_TEST_STRING:   .asciz "Test @ @ @ Test!"
+
+	STACK_IN_USE:			.asciz "Stack starts at 0x@, SP is currently at 0x@; there are 0x@ bytes of stack remaining."
 
 	.align 8
 
