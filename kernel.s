@@ -611,9 +611,38 @@
 	ret
 
 	/*
+		clears a block of memory, 8 bytes at a time
+		takes 2 args on stack, returns 0
+		trashes 2 registers
+	*/
+
+	_clearmem:
+		psh2 x0, x1
+		ldr  x0, [sp, 16]
+		ldr  x1, [sp, 24]
+
+		/*
+			x0 -- start of block to erase
+			x1 -- number of dwords to erase
+		*/
+
+		_clearmem_loop:
+			cbz x1, _clearmem_loop_end
+			dec x1
+			str xzr, [x0]
+			add x0, x0, 8
+			b   _clearmem_loop
+		_clearmem_loop_end:
+
+		pop2 x0, x1
+	ret
+
+
+
+	/*
 		compares strings for equality, returns position of difference or -1 for equal
 		takes 2 args on stack, returns 1
-		trashes 5 registers
+		trashes 4 registers
 	*/
 	_strcompare:
 		psh2 x0, x1
