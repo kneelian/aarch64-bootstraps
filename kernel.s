@@ -516,8 +516,6 @@
 	psh x1
 	bl  _ufputs
 
-
-
 	997:
 		b .
 
@@ -562,11 +560,12 @@
 			sub  x0, x0, 1
 			add  x1, x1, 1
 			add  x1, x1, 1
+			b _memcpy_loop
 		_memcpy_loop_end:
 
 		pop2 x2, x3 
 		pop2 x0, x1
-		ret
+	ret
 
 	/*
 		copies memory to memory, 8 bytes at once
@@ -594,11 +593,52 @@
 			sub  x0, x0, 1
 			add  x1, x1, 8
 			add  x1, x1, 8
+			b _memcpy8_loop
 		_memcpy8_loop_end:
 
 		pop2 x2, x3 
 		pop2 x0, x1
-		ret
+	ret
+
+	/*
+		compares strings for equality, returns position of difference or -1 for equal
+		takes 2 args on stack, returns 1
+		trashes 5 registers
+	*/
+	_strcompare:
+		psh2 x0, x1
+		psh2 x2, x3
+		psh2 x4, x5
+
+		ldp x0, x1, [sp, 48] // strings to compare
+
+		clr x2 // counter
+
+		_strcompare_loop:
+			ldrb w3, [x0]
+			ldrb w4, [x1]
+			cbz  w3, _strcompare_loop_end
+			cbz  w4, _strcompare_loop_end
+
+			cmp  w3, w4
+			b.ne _strcompare_loop_end
+
+			add x2, x2, 1
+			b _strcompare_loop
+
+		_strcompare_loop_end:
+
+		cmp  w3, w4
+		b.ne _strcompare_skip
+
+		sub  x2, xzr, 1 // in case the loop exits and w3 == w4, then w3 == 0, return -1
+
+		_strcompare_skip:
+
+		pop2 x4, x5
+		pop2 x2, x3
+		pop2 x0, x1
+	ret
 
 	/*
 		draw pixel
