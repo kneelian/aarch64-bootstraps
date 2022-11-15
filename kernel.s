@@ -545,6 +545,40 @@
 	/////////////////////// functions and subroutines
 
 	/*
+		draws a single 8x8 character to screen
+		supposed to be a low-level routine for 8px character handling
+		takes 4 arguments on stack, returns 0
+			- colour  (word)
+			- start y (word)
+			- start x (word)
+			- bitmap for character (dword)
+	*/
+	_draw_8x8:
+		psh2 x0, x1
+		psh2 x2, x3
+		psh2 x4, x5
+		psh2 x6, x30
+
+		ldr  x0, [sp, 40] // bitmap dword 
+		ldr  w1, [sp, 48] // start x
+		ldr  w2, [sp, 52] // start y
+		ldr  w3, [sp, 56] // colour
+
+		/* 
+			parse each byte bit by bit
+			reverse bits then lsl one by one
+			and when true, push that single pixel
+
+			then repeat this for 7 more rows
+		*/
+
+		pop2 x6, x30
+		pop2 x4, x5
+		pop2 x2, x3
+		pop2 x0, x1
+	ret
+
+	/*
 		transforms int to boolean
 		takes 1 arg on stack, returns 1
 		trashes 1 register
