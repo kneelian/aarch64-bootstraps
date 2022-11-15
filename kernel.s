@@ -759,46 +759,6 @@
 		pop2 x4, x30
 		pop2 x2, x3
 		pop2 x0, x1
-
-	/*
-		psh2 x0, x1
-		psh2 x2, x3
-		psh2 x4, x30
-
-		ldr x0, [sp, 48]
-		mov x1, 10
-
-		psh xzr
-
-		_i2dec_w_loop:
-			cbz x0, _i2dec_w_loop_2
-			mov x2, x0
-
-			mod  x2, x1, x3 // dont forget this isnt the standard arm insn format!
-			udiv x0, x0, x1
-			add  x2, x2, 0x30
-
-			psh x2
-			bl  _digit2decchar
-
-			udiv x0, x0, x1
-
-			b _i2dec_w_loop
-		_i2dec_w_loop_2:
-			pop x4
-			cbz x4, _i2dec_w_loop_2_end
-
-			add x3, x3, x4
-			lsr x3, x3, 8
-
-		_i2dec_w_loop_2_end:
-
-		str x3, [sp, 48]
-
-		pop2 x4, x30
-		pop2 x2, x3 
-		pop2 x0, x1
-		ret*/
 	
 	/* get single int turn to char */
 
@@ -878,8 +838,6 @@
 		templated print
 		takes pointer to structure on stack
 		returns 0
-
-		working!
 	*/
 	_ufputs:
 		psh2 x0, x1
@@ -1072,4 +1030,3 @@
 	 		mov x0, 0
 	 		pop x30
 	 		ret
-	 		
