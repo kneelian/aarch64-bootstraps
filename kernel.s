@@ -579,6 +579,11 @@
 	ret
 
 	/*
+		8 x 16?
+		16x 16?
+		many options for other prints
+
+	/*
 		transforms int to boolean
 		takes 1 arg on stack, returns 1
 		trashes 1 register
