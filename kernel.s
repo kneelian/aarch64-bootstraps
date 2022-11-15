@@ -545,11 +545,25 @@
 	/////////////////////// functions and subroutines
 
 	/*
+		transforms int to boolean
+		takes 1 arg on stack, returns 1
+		trashes 1 register
+	*/
+	_logical:
+		psh x0
+		ldr x0, [sp, 8]
+		cbz x0, _logical_skip
+		mov x0, 1
+		_logical_skip:
+		str x0, [sp, 8]
+		pop x0
+	ret
+
+	/*
 		copies memory to memory, single bytes
 		takes 3 args on stack, returns 0
 		trashes 4 registers
 	*/
-
 	_memcpy:
 		psh2 x0, x1
 		psh2 x2, x3
@@ -582,7 +596,6 @@
 		takes 3 args on stack, returns 0
 		trashes 4 registers
 	*/
-
 	_memcpy8:
 		psh2 x0, x1
 		psh2 x2, x3
@@ -636,8 +649,6 @@
 
 		pop2 x0, x1
 	ret
-
-
 
 	/*
 		compares strings for equality, returns position of difference or -1 for equal
@@ -1060,5 +1071,5 @@
 	 	_rng_64_fallback:
 	 		mov x0, 0
 	 		pop x30
-	 		
 	 		ret
+	 		
