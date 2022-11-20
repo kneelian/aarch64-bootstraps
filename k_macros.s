@@ -11,6 +11,17 @@
 	add \reg, \reg, 1
 .endm
 
+.macro newline
+	psh x0
+	mov x0, 13
+	psh x0
+	mov x0, 10
+	psh x0
+	bl  _uputc
+	bl  _uputc
+	pop x0
+.endm
+
 .macro dec reg
 	sub \reg, \reg, 1
 .endm

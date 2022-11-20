@@ -525,3 +525,102 @@
 	 		mov x0, 0
 	 		pop x30
 	 		ret
+
+///
+
+	_int2hex:
+	/*
+		takes one arg on stack (64-bit hex)
+		prints as hex
+		returns zero
+	*/
+		psh2 x0, x1
+		psh2 x2, x3
+		psh2 x4, x30
+
+		ldr x0, [sp, 48] // the number
+		mov x1, 0x78
+		psh x1
+		mov x1, 0x30
+		psh x1
+		bl  _uputc
+		bl  _uputc
+
+		mov x2, #60
+		ldr x3, =HEXDIGITS_LOWERCASE
+
+		_int2hex_loop:
+			cbz x2, _int2hex_loop_end
+			lsr x1, x0, x2
+			and x1, x1, 0xf
+			ldr x4, [x3, x1]
+			psh x4
+			bl  _uputc
+			sub x2, x2, 4
+			b _int2hex_loop
+
+		_int2hex_loop_end:
+
+		and x1, x0, 0xf
+		ldr x4, [x3, x1]
+		psh x4
+		bl  _uputc
+
+		pop2 x4, x30
+		pop2 x2, x3
+		pop2 x0, x1
+		ret
+
+	_int2hex32:
+	/*
+		takes one arg on stack (64-bit hex)
+		prints as hex
+		returns zero
+	*/
+		psh2 x0, x1
+		psh2 x2, x3
+		psh2 x4, x30
+
+		ldr w0, [sp, 48] // the number
+		mov x1, 0x78
+		psh x1
+		mov x1, 0x30
+		psh x1
+		bl  _uputc
+		bl  _uputc
+
+		mov x2, #28
+		ldr x3, =HEXDIGITS_LOWERCASE
+
+		_int2hex32_loop:
+			cbz x2, _int2hex32_loop_end
+			lsr x1, x0, x2
+			and x1, x1, 0xf
+			ldr x4, [x3, x1]
+			psh x4
+			bl  _uputc
+			sub x2, x2, 4
+			b _int2hex32_loop
+
+		_int2hex32_loop_end:
+
+		and x1, x0, 0xf
+		ldr x4, [x3, x1]
+		psh x4
+		bl  _uputc
+
+		pop2 x4, x30
+		pop2 x2, x3
+		pop2 x0, x1
+		ret
+
+	_reverse_string:
+	/*
+		takes 2 arguments on stack:
+			sp   -- destination address
+			sp+8 -- source address, zero terminated
+	*/
+		ret
+
+		HEXDIGITS_UPPERCASE:   	.asciz "0123456789ABCDEF"
+		HEXDIGITS_LOWERCASE:    .asciz "0123456789abcdef"
