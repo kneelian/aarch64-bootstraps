@@ -473,6 +473,19 @@
 
 	newline
 
+	mov  w0, 32
+	mov  w1, 256
+	movn w2, 0
+	ldr  x3, =SIMPLE_FONT
+	ldr  x3, [x3]
+	
+	str w2, [sp, -4]!
+	str w1, [sp, -4]!
+	str w0, [sp, -4]!
+	psh x3
+
+	bl _draw_8x8
+
 	997:
 		//wfe
 		wfi
@@ -496,3 +509,4 @@
 	.align 8
 
 	.include "k_procedures.s"
+	.include "k_font.s"
