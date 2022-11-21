@@ -48,6 +48,9 @@
 				cbnz x6, _draw_8x8_loop_2_fg
 
 				ror x3, x3, 32
+
+				cbz w3, _draw_8x8_loop_2_skip_2
+
 				_draw_8x8_loop_2_fg:
 
 				add x10, x8, x1
@@ -59,6 +62,8 @@
 				bl  _drawpx
 
 				cbnz x6, _draw_8x8_loop_2_skip
+
+				_draw_8x8_loop_2_skip_2:
 
 				ror x3, x3, 32
 
@@ -134,6 +139,8 @@
 				cbnz x6, _draw_8x16_loop_2_fg
 
 				ror x3, x3, 32
+				cbz w3, _draw_8x16_loop_2_skip_2
+
 				_draw_8x16_loop_2_fg:
 
 				add x10, x8, x1
@@ -145,6 +152,8 @@
 				bl  _drawpx
 
 				cbnz x6, _draw_8x16_loop_2_skip
+
+				_draw_8x16_loop_2_skip_2:
 
 				ror x3, x3, 32
 
@@ -194,6 +203,8 @@
 				cbnz x6, _draw_8x16_loop_2_2_fg
 
 				ror x3, x3, 32
+				cbz w3, _draw_8x16_loop_2_2_skip_2
+
 				_draw_8x16_loop_2_2_fg:
 
 				add x10, x8, x1
@@ -205,6 +216,8 @@
 				bl  _drawpx
 
 				cbnz x6, _draw_8x16_loop_2_2_skip
+
+				_draw_8x16_loop_2_2_skip_2:
 
 				ror x3, x3, 32
 

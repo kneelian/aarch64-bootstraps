@@ -501,6 +501,16 @@
 
 	bl _draw_8x16
 
+	mov  w0, 40
+	mov w2, 0
+	str w2,  [sp, -4]!
+	movn  w2, 0
+	str w2,  [sp, -4]!
+	str w1,  [sp, -4]!
+	str w0,  [sp, -4]!
+	psh x3
+	bl _draw_8x16
+
 	997:
 		//wfe
 		wfi
