@@ -33,6 +33,8 @@
 		clr2 x10, x30
 
 		_draw_8x8_loop_1:
+			mov x4, 8
+			mov x8, 0
 
 			_draw_8x8_loop_2:
 				lsr x6, x0, x7
@@ -63,8 +65,8 @@
 			mov x4, 8
 			sub x5, x5, 1
 			add x9, x9, 1
-
-			cbz x7, _draw_8x8_loop_1_end
+			
+			cbz x5, _draw_8x8_loop_1_end
 			b _draw_8x8_loop_1
 		_draw_8x8_loop_1_end:
 
