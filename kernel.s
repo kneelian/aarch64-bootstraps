@@ -406,14 +406,11 @@
 	rev x22, x6
 
 	framebuffer_example:
-		cbz x20, framebuffer_example_end
 		str w21, [x22]
 		add w21, w21, 16
 		add x22, x22, 4
 		sub x20, x20, 1
-		b framebuffer_example
-
-	framebuffer_example_end:
+		cbnz x20, framebuffer_example
 
 	ldr x30, =RAMFB_INITIALISED
 	str x30, [sp, -8]!
@@ -475,16 +472,34 @@
 
 	mov  w0, 32
 	mov  w1, 256
-	movn w2, 0
-	ldr  x3, =SIMPLE_FONT
+	
+	ldr  x3, =SIMPLE_FONT_8x8
 	ldr  x3, [x3]
 	
-	str w2, [sp, -4]!
-	str w1, [sp, -4]!
-	str w0, [sp, -4]!
+	mov  w2, 1
+	str w2,  [sp, -4]!
+	movn w2, 0
+	str w2,  [sp, -4]!
+	str w1,  [sp, -4]!
+	str w0,  [sp, -4]!
 	psh x3
 
 	bl _draw_8x8
+
+	mov w0, 48
+	mov w1, 256
+
+	ldr x3, =SIMPLE_FONT_8x16
+
+	mov  w2, 1
+	str w2,  [sp, -4]!
+	movn w2, 0
+	str w2,  [sp, -4]!
+	str w1,  [sp, -4]!
+	str w0,  [sp, -4]!
+	psh x3
+
+	bl _draw_8x16
 
 	997:
 		//wfe

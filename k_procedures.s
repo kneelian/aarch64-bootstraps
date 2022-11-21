@@ -20,7 +20,7 @@
 		ldr  x0, [sp, 96] // bitmap dword 
 		ldr  w1, [sp, 104] // start x
 		ldr  w2, [sp, 108] // start y
-		ldr  w3, [sp, 112] // colour
+		ldr  x3, [sp, 112] // colour (first bg then fg)
 
 		mov x4, 8  // num of cols
 		mov x5, 8  // num of rows
@@ -45,7 +45,10 @@
 				sub x4, x4, 1
 				add x8, x8, 1
 
-				cbz x6, _draw_8x8_loop_2_skip
+				cbnz x6, _draw_8x8_loop_2_fg
+
+				ror x3, x3, 32
+				_draw_8x8_loop_2_fg:
 
 				add x10, x8, x1
 				add x30, x9, x2
@@ -53,10 +56,14 @@
 				str w10, [sp, -4]!
 				str w30, [sp, -4]!
 				str w3,  [sp, -4]!
-
 				bl  _drawpx
 
-			_draw_8x8_loop_2_skip:
+				cbnz x6, _draw_8x8_loop_2_skip
+
+				ror x3, x3, 32
+
+				_draw_8x8_loop_2_skip:
+
 				cbz x4, _draw_8x8_loop_2_end
 				b _draw_8x8_loop_2
 
@@ -65,7 +72,7 @@
 			mov x4, 8
 			sub x5, x5, 1
 			add x9, x9, 1
-			
+
 			cbz x5, _draw_8x8_loop_1_end
 			b _draw_8x8_loop_1
 		_draw_8x8_loop_1_end:
@@ -78,19 +85,151 @@
 		pop2 x0, x1
 		ret
 
-		/* 
-			parse each byte bit by bit
-			reverse bits then lsl one by one
-			and when true, push that single pixel
+	/*
+		draws a single 8x16 character to screen
+		supposed to be a low-level routine for 8px character handling
+		takes 4 arguments on stack, returns 0
+			- colour  (word)
+			- start y (word)
+			- start x (word)
+			- bitmap for character (dword) (popped twice)
+	*/
+	_draw_8x16:
+		psh2 x0, x1
+		psh2 x2, x3
+		psh2 x4, x5
+		psh2 x6, x30
+		psh2 x7, x8
+		psh2 x9, x10
 
-			then repeat this for 7 more rows
-		*/
+		ldr  x0, [sp, 96] // bitmap dword 
+		ldr  x0, [x0]
+		ldr  w1, [sp, 104] // start x
+		ldr  w2, [sp, 108] // start y
+		ldr  x3, [sp, 112] // colour (first bg then fg)
 
+		mov x4, 8  // num of cols
+		mov x5, 8  // num of rows
+
+		clr x6     // temp for bitshifted
+		mov x7, 63 // num of times to bitshift
+
+		clr2 x8, x9 // x8 + x4 = 8, etc
+
+		clr2 x10, x30
+
+		_draw_8x16_loop_1:
+			mov x4, 8
+			mov x8, 0
+
+			_draw_8x16_loop_2:
+				lsr x6, x0, x7
+				sub x7, x7, 1
+
+				and x6, x6, 0x1
+
+				sub x4, x4, 1
+				add x8, x8, 1
+
+				cbnz x6, _draw_8x16_loop_2_fg
+
+				ror x3, x3, 32
+				_draw_8x16_loop_2_fg:
+
+				add x10, x8, x1
+				add x30, x9, x2
+
+				str w10, [sp, -4]!
+				str w30, [sp, -4]!
+				str w3,  [sp, -4]!
+				bl  _drawpx
+
+				cbnz x6, _draw_8x16_loop_2_skip
+
+				ror x3, x3, 32
+
+				_draw_8x16_loop_2_skip:
+
+				cbz x4, _draw_8x16_loop_2_end
+				b _draw_8x16_loop_2
+
+			_draw_8x16_loop_2_end:
+
+			mov x4, 8
+			sub x5, x5, 1
+			add x9, x9, 1
+
+			cbz x5, _draw_8x16_loop_1_end
+			b _draw_8x16_loop_1
+		_draw_8x16_loop_1_end:
+
+		ldr  x0, [sp, 96]
+		add  x0, x0, 8
+		ldr  x0, [x0]
+		add  w2, w2, 8
+
+		mov x4, 8  // num of cols
+		mov x5, 8  // num of rows
+
+		clr x6     // temp for bitshifted
+		mov x7, 63 // num of times to bitshift
+
+		clr2 x8, x9 // x8 + x4 = 8, etc
+
+		clr2 x10, x30
+
+		_draw_8x16_loop_1_2:
+			mov x4, 8
+			mov x8, 0
+
+			_draw_8x16_loop_2_2:
+				lsr x6, x0, x7
+				sub x7, x7, 1
+
+				and x6, x6, 0x1
+
+				sub x4, x4, 1
+				add x8, x8, 1
+
+				cbnz x6, _draw_8x16_loop_2_2_fg
+
+				ror x3, x3, 32
+				_draw_8x16_loop_2_2_fg:
+
+				add x10, x8, x1
+				add x30, x9, x2
+
+				str w10, [sp, -4]!
+				str w30, [sp, -4]!
+				str w3,  [sp, -4]!
+				bl  _drawpx
+
+				cbnz x6, _draw_8x16_loop_2_2_skip
+
+				ror x3, x3, 32
+
+				_draw_8x16_loop_2_2_skip:
+
+				cbz x4, _draw_8x16_loop_2_2_end
+				b _draw_8x16_loop_2_2
+
+			_draw_8x16_loop_2_2_end:
+
+			mov x4, 8
+			sub x5, x5, 1
+			add x9, x9, 1
+
+			cbz x5, _draw_8x16_loop_1_2_end
+			b _draw_8x16_loop_1_2
+		_draw_8x16_loop_1_2_end:
+
+		pop2 x9, x10
+		pop2 x7, x8
 		pop2 x6, x30
 		pop2 x4, x5
 		pop2 x2, x3
 		pop2 x0, x1
-	ret
+		ret
 
 	/*
 		8 x 16?
