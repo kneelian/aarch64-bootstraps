@@ -511,7 +511,7 @@
 	psh x3
 	bl _draw_8x16
 
-	mov w0, 56
+	mov w0, 64
 	ldr x3, =SIMPLE_FONT_16x16
 	mov w2, 1
 	str w2,  [sp, -4]!

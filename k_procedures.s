@@ -244,279 +244,71 @@
 		pop2 x0, x1
 		ret
 
+	/*
+	*/
+
 	_draw_16x16:
 		psh2 x0, x1
 		psh2 x2, x3
-		psh2 x4, x5
-		psh2 x6, x30
-		psh2 x7, x8
-		psh2 x9, x10
-
-		ldr  x0, [sp, 96] // bitmap dword 
-		ldr  x0, [x0]
-		ldr  w1, [sp, 104] // start x
-		ldr  w2, [sp, 108] // start y
-		ldr  x3, [sp, 112] // colour (first bg then fg)
-
-		mov x4, 8  // num of cols
-		mov x5, 8  // num of rows
-
-		clr x6     // temp for bitshifted
-		mov x7, 63 // num of times to bitshift
-
-		clr2 x8, x9 // x8 + x4 = 8, etc
-
-		clr2 x10, x30
-
-		_draw_16x16_loop_1:
-			mov x4, 8
-			mov x8, 0
-
-			_draw_16x16_loop_2:
-				lsr x6, x0, x7
-				sub x7, x7, 1
-
-				and x6, x6, 0x1
-
-				sub x4, x4, 1
-				add x8, x8, 1
-
-				cbnz x6, _draw_16x16_loop_2_fg
-
-				ror x3, x3, 32
-				cbz w3, _draw_16x16_loop_2_skip_2
-
-				_draw_16x16_loop_2_fg:
-
-				add x10, x8, x1
-				add x30, x9, x2
-
-				str w10, [sp, -4]!
-				str w30, [sp, -4]!
-				str w3,  [sp, -4]!
-				bl  _drawpx
-
-				cbnz x6, _draw_16x16_loop_2_skip
-
-				_draw_16x16_loop_2_skip_2:
-
-				ror x3, x3, 32
-
-				_draw_16x16_loop_2_skip:
-
-				cbz x4, _draw_16x16_loop_2_end
-				b _draw_16x16_loop_2
-
-			_draw_16x16_loop_2_end:
-
-			mov x4, 8
-			sub x5, x5, 1
-			add x9, x9, 1
-
-			cbz x5, _draw_16x16_loop_1_end
-			b _draw_16x16_loop_1
-		_draw_16x16_loop_1_end:
-
-		ldr  x0, [sp, 96]
-		add  x0, x0, 8
-		ldr  x0, [x0]
-		add  w1, w1, 8
-
-		mov x4, 8  // num of cols
-		mov x5, 8  // num of rows
-
-		clr x6     // temp for bitshifted
-		mov x7, 63 // num of times to bitshift
-
-		clr2 x8, x9 // x8 + x4 = 8, etc
-
-		clr2 x10, x30
-
-		_draw_16x16_loop_1_2:
-			mov x4, 8
-			mov x8, 0
-
-			_draw_16x16_loop_2_2:
-				lsr x6, x0, x7
-				sub x7, x7, 1
-
-				and x6, x6, 0x1
-
-				sub x4, x4, 1
-				add x8, x8, 1
-
-				cbnz x6, _draw_16x16_loop_2_2_fg
-
-				ror x3, x3, 32
-				cbz w3, _draw_16x16_loop_2_2_skip_2
-
-				_draw_16x16_loop_2_2_fg:
-
-				add x10, x8, x1
-				add x30, x9, x2
-
-				str w10, [sp, -4]!
-				str w30, [sp, -4]!
-				str w3,  [sp, -4]!
-				bl  _drawpx
-
-				cbnz x6, _draw_16x16_loop_2_2_skip
-
-				_draw_16x16_loop_2_2_skip_2:
-
-				ror x3, x3, 32
-
-				_draw_16x16_loop_2_2_skip:
-
-				cbz x4, _draw_16x16_loop_2_2_end
-				b _draw_16x16_loop_2_2
-
-			_draw_16x16_loop_2_2_end:
-
-			mov x4, 8
-			sub x5, x5, 1
-			add x9, x9, 1
-
-			cbz x5, _draw_16x16_loop_1_2_end
-			b _draw_16x16_loop_1_2
-		_draw_16x16_loop_1_2_end:
-
-		ldr  x0, [sp, 96]
-		add  x0, x0, 16
-		ldr  x0, [x0]
-		sub  w1, w1, 8
-		add  w2, w2, 8
-
-		mov x4, 8  // num of cols
-		mov x5, 8  // num of rows
-
-		clr x6     // temp for bitshifted
-		mov x7, 63 // num of times to bitshift
-
-		clr2 x8, x9 // x8 + x4 = 8, etc
-
-		clr2 x10, x30
-
-		_draw_16x16_loop_1_3:
-			mov x4, 8
-			mov x8, 0
-
-			_draw_16x16_loop_2_3:
-				lsr x6, x0, x7
-				sub x7, x7, 1
-
-				and x6, x6, 0x1
-
-				sub x4, x4, 1
-				add x8, x8, 1
-
-				cbnz x6, _draw_16x16_loop_2_3_fg
-
-				ror x3, x3, 32
-				cbz w3, _draw_16x16_loop_2_3_skip_2
-
-				_draw_16x16_loop_2_3_fg:
-
-				add x10, x8, x1
-				add x30, x9, x2
-
-				str w10, [sp, -4]!
-				str w30, [sp, -4]!
-				str w3,  [sp, -4]!
-				bl  _drawpx
-
-				cbnz x6, _draw_16x16_loop_2_3_skip
-
-				_draw_16x16_loop_2_3_skip_2:
-
-				ror x3, x3, 32
-
-				_draw_16x16_loop_2_3_skip:
-
-				cbz x4, _draw_16x16_loop_2_3_end
-				b _draw_16x16_loop_2_3
-
-			_draw_16x16_loop_2_3_end:
-
-			mov x4, 8
-			sub x5, x5, 1
-			add x9, x9, 1
-
-			cbz x5, _draw_16x16_loop_1_3_end
-			b _draw_16x16_loop_1_3
-		_draw_16x16_loop_1_3_end:
-
-		ldr  x0, [sp, 96]
-		add  x0, x0, 24
-		ldr  x0, [x0]
-		add  w1, w1, 8
-
-		mov x4, 8  // num of cols
-		mov x5, 8  // num of rows
-
-		clr x6     // temp for bitshifted
-		mov x7, 63 // num of times to bitshift
-
-		clr2 x8, x9 // x8 + x4 = 8, etc
-
-		clr2 x10, x30
-
-		_draw_16x16_loop_1_4:
-			mov x4, 8
-			mov x8, 0
-
-			_draw_16x16_loop_2_4:
-				lsr x6, x0, x7
-				sub x7, x7, 1
-
-				and x6, x6, 0x1
-
-				sub x4, x4, 1
-				add x8, x8, 1
-
-				cbnz x6, _draw_16x16_loop_2_4_fg
-
-				ror x3, x3, 32
-				cbz w3, _draw_16x16_loop_2_4_skip_2
-
-				_draw_16x16_loop_2_4_fg:
-
-				add x10, x8, x1
-				add x30, x9, x2
-
-				str w10, [sp, -4]!
-				str w30, [sp, -4]!
-				str w3,  [sp, -4]!
-				bl  _drawpx
-
-				cbnz x6, _draw_16x16_loop_2_4_skip
-
-				_draw_16x16_loop_2_4_skip_2:
-
-				ror x3, x3, 32
-
-				_draw_16x16_loop_2_4_skip:
-
-				cbz x4, _draw_16x16_loop_2_4_end
-				b _draw_16x16_loop_2_4
-
-			_draw_16x16_loop_2_4_end:
-
-			mov x4, 8
-			sub x5, x5, 1
-			add x9, x9, 1
-
-			cbz x5, _draw_16x16_loop_1_4_end
-			b _draw_16x16_loop_1_4
-		_draw_16x16_loop_1_4_end:
-
-		pop2 x9, x10
-		pop2 x7, x8
-		pop2 x6, x30
-		pop2 x4, x5
-		pop2 x2, x3
-		pop2 x0, x1
-		ret
+		psh2 x4, x30
+
+		ldr  x0, [sp, 48] // bitmap address 
+		ldr  w1, [sp, 56] // start x
+		ldr  w2, [sp, 60] // start y
+		ldr  x3, [sp, 64] // colour (first bg then fg)
+
+		ldr x4, [x0]
+
+		psh x3
+		str w2, [sp, -4]!
+		str w1, [sp, -4]!
+		psh x4
+		bl _draw_8x8
+
+		add sp, sp, 24
+		add w1, w1, 8
+		ldr x4, [x0, 8]
+
+		psh x3
+		str w2, [sp, -4]!
+		str w1, [sp, -4]!
+		rev  x4, x4
+		rbit x4, x4
+		psh x4
+		bl _draw_8x8
+
+		add sp, sp, 24
+		sub w1, w1, 8
+		add w2, w2, 8
+		ldr x4, [x0, 16]
+
+		psh x3
+		str w2, [sp, -4]!
+		str w1, [sp, -4]!
+		rev  x4, x4
+		rbit x4, x4
+		psh x4
+		bl _draw_8x8
+
+		add sp, sp, 24
+		add w1, w1, 8
+		ldr x4, [x0, 24]
+
+		psh x3
+		str w2, [sp, -4]!
+		str w1, [sp, -4]!
+		rev  x4, x4
+		rbit x4, x4
+		psh x4
+		bl _draw_8x8
+
+		pop2 x4, x30
+		pop2 x2, x3 
+		pop2 x0, x1 
+
+
+
+	ret
 
 	/*
 		draw pixel
