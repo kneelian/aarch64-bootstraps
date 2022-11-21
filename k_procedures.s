@@ -272,8 +272,6 @@
 		psh x3
 		str w2, [sp, -4]!
 		str w1, [sp, -4]!
-		rev  x4, x4
-		rbit x4, x4
 		psh x4
 		bl _draw_8x8
 
@@ -285,8 +283,6 @@
 		psh x3
 		str w2, [sp, -4]!
 		str w1, [sp, -4]!
-		rev  x4, x4
-		rbit x4, x4
 		psh x4
 		bl _draw_8x8
 
@@ -297,8 +293,6 @@
 		psh x3
 		str w2, [sp, -4]!
 		str w1, [sp, -4]!
-		rev  x4, x4
-		rbit x4, x4
 		psh x4
 		bl _draw_8x8
 

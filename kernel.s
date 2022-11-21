@@ -474,7 +474,7 @@
 	mov  w1, 256
 	
 	ldr  x3, =SIMPLE_FONT_8x8
-	ldr  x3, [x3]
+	ldr  x3, [x3, 24]
 	
 	mov  w2, 1
 	str w2,  [sp, -4]!
@@ -483,8 +483,8 @@
 	str w1,  [sp, -4]!
 	str w0,  [sp, -4]!
 	psh x3
-
 	bl _draw_8x8
+	add sp, sp, 24
 
 	mov w0, 48
 	mov w1, 256
@@ -498,8 +498,21 @@
 	str w1,  [sp, -4]!
 	str w0,  [sp, -4]!
 	psh x3
-
 	bl _draw_8x16
+	add sp, sp, 24
+
+	add x3, x3, 16
+	add w0, w0, 40
+	add w1, w1, 40
+	mov w2, 1
+	str w2,  [sp, -4]!
+	movn w2, 0
+	str w2,  [sp, -4]!
+	str w1,  [sp, -4]!
+	str w0,  [sp, -4]!
+	psh x3
+	bl _draw_8x16
+	add sp, sp, 24
 
 	mov w0, 40
 	mov w2, 0
@@ -510,6 +523,7 @@
 	str w0,  [sp, -4]!
 	psh x3
 	bl _draw_8x16
+	add sp, sp, 24
 
 	mov w0, 64
 	ldr x3, =SIMPLE_FONT_16x16
@@ -521,6 +535,7 @@
 	str w0,  [sp, -4]!
 	psh x3
 	bl _draw_16x16
+	add sp, sp, 24
 
 	997:
 		//wfe
