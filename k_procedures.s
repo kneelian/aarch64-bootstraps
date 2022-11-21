@@ -1,5 +1,5 @@
 	/////////////////////// functions and subroutines
-
+	.align 8
 	/*
 		draws a single 8x8 character to screen
 		supposed to be a low-level routine for 8px character handling
@@ -14,11 +14,67 @@
 		psh2 x2, x3
 		psh2 x4, x5
 		psh2 x6, x30
+		psh2 x7, x8
+		psh2 x9, x10
 
-		ldr  x0, [sp, 40] // bitmap dword 
-		ldr  w1, [sp, 48] // start x
-		ldr  w2, [sp, 52] // start y
-		ldr  w3, [sp, 56] // colour
+		ldr  x0, [sp, 96] // bitmap dword 
+		ldr  w1, [sp, 104] // start x
+		ldr  w2, [sp, 108] // start y
+		ldr  w3, [sp, 112] // colour
+
+		mov x4, 8  // num of cols
+		mov x5, 8  // num of rows
+
+		clr x6     // temp for bitshifted
+		mov x7, 63 // num of times to bitshift
+
+		clr2 x8, x9 // x8 + x4 = 8, etc
+
+		clr2 x10, x30
+
+		_draw_8x8_loop_1:
+
+			_draw_8x8_loop_2:
+				lsr x6, x0, x7
+				sub x7, x7, 1
+
+				and x6, x6, 0x1
+
+				sub x4, x4, 1
+				add x8, x8, 1
+
+				cbz x6, _draw_8x8_loop_2_skip
+
+				add x10, x8, x1
+				add x30, x9, x2
+
+				str w10, [sp, -4]!
+				str w30, [sp, -4]!
+				str w3,  [sp, -4]!
+
+				bl  _drawpx
+
+			_draw_8x8_loop_2_skip:
+				cbz x4, _draw_8x8_loop_2_end
+				b _draw_8x8_loop_2
+
+			_draw_8x8_loop_2_end:
+
+			mov x4, 8
+			sub x5, x5, 1
+			add x9, x9, 1
+
+			cbz x7, _draw_8x8_loop_1_end
+			b _draw_8x8_loop_1
+		_draw_8x8_loop_1_end:
+
+		pop2 x9, x10
+		pop2 x7, x8
+		pop2 x6, x30
+		pop2 x4, x5
+		pop2 x2, x3
+		pop2 x0, x1
+		ret
 
 		/* 
 			parse each byte bit by bit
@@ -38,6 +94,36 @@
 		8 x 16?
 		16x 16?
 		many options for other prints
+
+	/*
+		draw pixel
+		takes 3 args on stack, returns 0
+		trashes 5 registers
+	*/
+	_drawpx:
+		psh2 x0, x1
+		psh2 x2, x3
+		psh  x4
+
+		ldr x0, =ramfb_bottom
+
+		ldr  w1, [sp, 40] // colour
+		ldr  w2, [sp, 44] // y
+		ldr  w3, [sp, 48] // x
+
+		mov  w4, 1024
+
+		madd w2, w2, w4, w3
+		lsl  w2, w2, 2
+		add  x0, x0, x2
+
+		str  w1, [x0]
+
+		pop  x4
+		pop2 x2, x3
+		pop2 x0, x1 
+		add sp, sp, 12
+	ret
 
 	/*
 		transforms int to boolean
@@ -183,36 +269,6 @@
 		pop2 x4, x5
 		pop2 x2, x3
 		pop2 x0, x1
-	ret
-
-	/*
-		draw pixel
-		takes 3 args on stack, returns 0
-		trashes 5 registers
-	*/
-	_drawpx:
-		psh2 x0, x1
-		psh2 x2, x3
-		psh  x4
-
-		ldr x0, =ramfb_bottom
-
-		ldr  w1, [sp, 40] // colour
-		ldr  w2, [sp, 44] // y
-		ldr  w3, [sp, 48] // x
-
-		mov  w4, 1024
-
-		madd w2, w2, w4, w3
-		lsl  w2, w2, 2
-		add  x0, x0, x2
-
-		str  w1, [x0]
-
-		pop  x4
-		pop2 x2, x3
-		pop2 x0, x1 
-		add sp, sp, 12
 	ret
 
 	/* broken */
