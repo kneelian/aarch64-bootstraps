@@ -2,7 +2,7 @@ CROSS_PREFIX=aarch64-none-elf-
 
 all: kernel.elf
 	
-kernel.o: kernel.s k_macros.s k_procedures.s k_font.s
+kernel.o: kernel.s k_macros.s k_procedures.s k_font.s k_macro_status_int.s
 	$(CROSS_PREFIX)as.exe -g -c kernel.s -o $@
 
 kernel.elf: kernel.o

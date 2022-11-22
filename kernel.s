@@ -52,6 +52,8 @@
 
     	isb
 
+    	status_int
+
     	// check if RNG is enabled or not
 
     	mrs x0, ID_AA64ISAR0_EL1
@@ -535,11 +537,10 @@
 	str w0,  [sp, -4]!
 	psh x3
 	bl _draw_16x16
-	add sp, sp, 24
 
 	997:
 		//wfe
-		wfi
+		status_int
 
 		ldr x0, =0x84000008
 		hvc #0

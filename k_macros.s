@@ -19,6 +19,7 @@
 	psh x0
 	bl  _uputc
 	bl  _uputc
+	add sp, sp, 16
 	pop x0
 .endm
 
@@ -68,3 +69,5 @@
 	str  \reg11, [\reg10]
 	pop2 \reg10, \reg11
 .endm
+
+.include "k_macro_status_int.s"

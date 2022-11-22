@@ -264,8 +264,8 @@
 		str w1, [sp, -4]!
 		psh x4
 		bl _draw_8x8
-
 		add sp, sp, 24
+
 		add w1, w1, 8
 		ldr x4, [x0, 8]
 
@@ -274,8 +274,8 @@
 		str w1, [sp, -4]!
 		psh x4
 		bl _draw_8x8
-
 		add sp, sp, 24
+
 		sub w1, w1, 8
 		add w2, w2, 8
 		ldr x4, [x0, 16]
@@ -285,8 +285,8 @@
 		str w1, [sp, -4]!
 		psh x4
 		bl _draw_8x8
-
 		add sp, sp, 24
+
 		add w1, w1, 8
 		ldr x4, [x0, 24]
 
@@ -295,12 +295,11 @@
 		str w1, [sp, -4]!
 		psh x4
 		bl _draw_8x8
+		add sp, sp, 24
 
 		pop2 x4, x30
 		pop2 x2, x3 
 		pop2 x0, x1 
-
-
 
 	ret
 
