@@ -191,7 +191,7 @@
 
 		dma_find_file_loop:
 			sub w6, w6, 1
-			cbz w6, 997f
+			//cbz w6, 997f
 
 			ldr w12, [x1]
 			ldr x13, [x1, 6]
