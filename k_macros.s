@@ -69,5 +69,3 @@
 	str  \reg11, [\reg10]
 	pop2 \reg10, \reg11
 .endm
-
-.include "k_macro_status_int.s"

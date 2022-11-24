@@ -13,6 +13,7 @@
 	str w1, [sp, -4]!
 	str w2, [sp, -4]!
 	bl _drawpx
+	add sp, sp, 12
 
 	ldr x20, =TEMPLATE_TEST_STRING
 	ldr x21, =EXAMPLE_STRING
@@ -50,6 +51,7 @@
 	mov x0, 0xf0f0
 	psh x0
 	bl _int2hex32
+	pop x0
 
 	newline
 

@@ -17,6 +17,7 @@
 // to write
 
 .include "k_macros.s"
+.include "k_macro_status_int.s"
 
 	.section .text
 	1:
@@ -120,3 +121,4 @@
 
 	.include "k_procedures.s"
 	.include "k_font.s"
+	.include "k_sha-256.s"
