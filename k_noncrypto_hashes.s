@@ -47,6 +47,8 @@ _hash_3r_a_64b:
 	str w0, [sp, 32]
 	ldr w0, [sp, 36] // other word
 
+	sub w0, w0, 1 // x--
+
 	ldr w2, [x1], 4
 
 	lsr w3, w0, 16
