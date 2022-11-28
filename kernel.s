@@ -122,3 +122,4 @@
 	.include "k_procedures.s"
 	.include "k_font.s"
 	.include "k_sha-256.s"
+	.include "k_noncrypto_hashes.s"

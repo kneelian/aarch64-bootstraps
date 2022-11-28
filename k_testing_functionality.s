@@ -122,6 +122,9 @@
 	bl _draw_16x16
 
 	bl _rng_64
-	pop x25
+	psh xzr
+	newline 
+	bl _hash_3r_a_64b
+	bl _int2hex
 
 	b terminate
