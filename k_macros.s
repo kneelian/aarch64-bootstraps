@@ -19,7 +19,6 @@
 	psh x0
 	bl  _uputc
 	bl  _uputc
-	add sp, sp, 16
 	pop x0
 .endm
 
