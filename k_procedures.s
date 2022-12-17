@@ -8,6 +8,8 @@
 			- start y (word)
 			- start x (word)
 			- bitmap for character (dword)
+
+			colour zero means transparent; use 0x1 for black
 	*/
 	_draw_8x8:
 		psh2 x0, x1
@@ -98,6 +100,8 @@
 			- start y (word)
 			- start x (word)
 			- bitmap for character (dword) (popped twice)
+
+			colour zero means transparent; use 0x1 for black
 	*/
 	_draw_8x16:
 		psh2 x0, x1

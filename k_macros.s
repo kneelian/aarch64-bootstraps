@@ -1,10 +1,10 @@
 .macro clr reg
-	eor \reg, \reg, \reg
+	mov \reg, 0
 .endm
 
 .macro clr2 rega regb
-	eor \rega, \rega, \rega
-	eor \regb, \regb, \regb
+	mov \rega, 0
+	mov \regb, 0
 .endm
 
 .macro inc reg
@@ -27,10 +27,10 @@
 .endm
 
 .macro clr4 rega regb regc regd
-	eor \rega, \rega, \rega
-	eor \regb, \regb, \regb
-	eor \regc, \regc, \regc
-	eor \regd, \regd, \regd
+	mov \rega, 0
+	mov \regb, 0
+	mov \regc, 0
+	mov \regd, 0
 .endm
 
 .macro mod rega regb temp

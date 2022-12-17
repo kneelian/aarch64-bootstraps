@@ -1,3 +1,4 @@
+	mov x21, 0
 	framebuffer_example:
 		str w21, [x22]
 		add w21, w21, 16
@@ -126,5 +127,22 @@
 	newline 
 	bl _hash_3r_a_64b
 	bl _int2hex
+/*
+	psh2 x0, x1
+	psh2 x2, x3
 
+	ldr x0, =_Reset
+	ldr x1, =ramfb_bottom
+	mov x2, 0x4000
+	lsl x2, x2, 4
+	_copy_kernel_into_vram_for_fun_loop:
+		cbz x2, _copy_kernel_into_vram_for_fun_loop_end
+		sub x2, x2, 4
+		ldr w3, [x0], 4
+		str w3, [x1], 4
+		b _copy_kernel_into_vram_for_fun_loop
+	_copy_kernel_into_vram_for_fun_loop_end: 
+	pop2 x2, x3
+	pop2 x0, x1
+*/
 	b terminate

@@ -145,7 +145,6 @@ _kotodama_e:
     	bl      _kt_decoder
     	//b 		_kt_mainloop
 
-
 	pop2 x30, sp
 	pop2 x28, x29
 	pop2 x26, x27
@@ -175,8 +174,49 @@ ret
 */
 
 _kt_decoder:
+	cbz x3, _kt_decoder_end
+
+	mov x4, 0x0009
+	cmp x3, x4
+	b.eq _kt_decoder_end
+
+	add x4, x4, 1
+	cmp x3, x4
+	b.eq _kt_decoder_end
+
+	add x4, x4, 3
+	cmp x3, x4
+	b.eq _kt_decoder_end
+
+	add x4, x4, 0x13
+	cmp x3, x4
+	b.eq _kt_decoder_end
+
+	mov 	x4, 0x200a		// the whole range between
+	cmp 	x3, x4 			// 2000--200a inclusive are
+	b.gt 	_kt_dc_sk1 		// all whitespace characters
+	sub 	x4, x4, 0xa 	// and they're getting skipped
+	cmp  	x3, x4 			// collectively instead of one by
+	b.ge 	_kt_decoder_end // one in a per character check
+	_kt_dc_sk1:
+
+	mov x4, 0x3000 // cjk fullwidth space
+	cmp x3, x4
+	b.eq _kt_decoder_end
+
+	/*
+		actual character literals start
+		here. they're not ordered according
+		to any special principle, they're just
+		a fat ass block. characters that are
+		close to eachother in codepoints
+		may get lumped together but this serves
+		no optimisation purpose (the mov insn
+		allows 16 bit immediates in aarch64).
+	*/
 
 	mov x4, 0x8a18 // 記 record, remember.
 	cmp x3, x4
 	// b.eq 
+_kt_decoder_end:
 	ret
