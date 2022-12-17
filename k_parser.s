@@ -122,16 +122,28 @@ _kotodama_e:
 		x0 stores the instruction pointer / IP
 		x1 stores the heap pointer / HP
 		x2 stores the stack pointer / SP
+		x3 is the fetch destination
+		x4 holds candidates in the decoder
+
+		registers x6--x28 are volatile and can be used for
+		whatever purposes subroutines need.
 
 		the interpreter accesses its own data stack via the x2
 		register, and otherwise uses the regular SP for
 		functionality and calling kernel subroutines and the
 		graphics drivers and probs storage down the line.
+	
+		each iteration of the loop starts by 
+		- loading a halfword at x0 into x3
+		- jumping to the decoder
+		- decoding and performing the op
+		- returning 
 	*/
     
-
     _kt_mainloop:
-//    	b _kt_mainloop
+    	ldrh	w3, [x0], 2
+    	bl      _kt_decoder
+    	//b 		_kt_mainloop
 
 
 	pop2 x30, sp
@@ -150,5 +162,21 @@ _kotodama_e:
 	pop2 x4, x5
 	pop2 x2, x3
 	pop2 x0, x1
-
 ret
+
+/*
+	Instruction decoder.
+	Infinitely extendable.
+
+	Instruction arrives to decoder
+	via x3, so most of the logic
+	happens either directly in here or
+	in a subroutine called from here 
+*/
+
+_kt_decoder:
+
+	mov x4, 0x8a18 // 記 record, remember.
+	cmp x3, x4
+	// b.eq 
+	ret
