@@ -106,6 +106,12 @@
 
 	/////////////////////////// strings
 
+	.include "k_procedures.s"
+	.include "k_sha-256.s"
+	.include "k_noncrypto_hashes.s"
+
+	.include "fsys/k_filesystem.s"
+
 	DMA_DETECTED:   		.asciz "DMA device detected!\n\r"
 	DMA_READ_BEGIN: 		.asciz "Probing the fw_cfg file directory through the DMA interface.\n\r"
 	DMA_READ_NUM_FILES:		.asciz "Found nr of files: 0x"
@@ -119,7 +125,4 @@
 
 	.align 8
 
-	.include "k_procedures.s"
 	.include "k_font.s"
-	.include "k_sha-256.s"
-	.include "k_noncrypto_hashes.s"
