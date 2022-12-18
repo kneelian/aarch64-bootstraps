@@ -840,7 +840,7 @@
 
 	_int2hex32:
 	/*
-		takes one arg on stack (64-bit hex)
+		takes one arg on stack (32-bit hex)
 		prints as hex
 		returns zero
 	*/

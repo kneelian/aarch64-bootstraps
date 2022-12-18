@@ -163,7 +163,9 @@ _kotodama_e:
     _kt_mainloop:
     	ldrh	w3, [x0], 2
     	bl      _kt_decoder
-    	//b 		_kt_mainloop
+    	b 		_kt_mainloop
+
+    _kt_cleanup:
 
 	pop2 x30, sp
 /*	pop2 x28, x29
@@ -235,8 +237,55 @@ _kt_decoder:
 		allows 16 bit immediates in aarch64).
 	*/
 
-	mov x4, 0x8a18 // 記 record, remember.
+	mov 	x4, 0x8a8d // 認 njinH confess, admit to
+	cmp 	x3, x4
+	b.eq	_kt_status_report
+
+	mov		x4, 0x6b7b // 死 syiX die, perish
+	cmp		x3, x4
+	b.eq	_kt_kill_interpreter
+
+	mov x4, 0x8a18 // 記 kɨH record, remember.
 	cmp x3, x4
 	// b.eq 
 _kt_decoder_end:
 	ret
+
+/*
+	認 u+8a8d /njinH/ "confess, admit to"
+		prints contents of relevant interpreter
+		status registers, and continues with execution
+*/
+_kt_status_report:
+	psh x30
+
+	psh w0
+	bl _int2hex32
+	newline
+	psh w1
+	bl _int2hex32
+	newline
+	psh w2
+	bl _int2hex32
+	newline
+	psh w3
+	bl _int2hex32
+	newline
+	psh w4
+	bl _int2hex32
+	newline
+
+	pop x30
+	ret // don't really need to go back to the decoder for this
+
+/*
+	死 u+6b7b /syiX/ "die, perish"
+		basically tells the inteprpeter to drop dead
+		and return immediately to kernel. Equivalent of a kill
+		signal. Does not do any memory cleanup, only restores
+		stack pointer and linker register to what they were upon
+		entry and immediately returns
+		allows us to recover from intepreter scripts
+*/
+_kt_kill_interpreter:
+	b _kt_cleanup
