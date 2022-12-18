@@ -90,7 +90,7 @@
 */
 
 _kotodama_e:
-	psh2 x0, x1
+/*	psh2 x0, x1
 	psh2 x2, x3
 	psh2 x4, x5
 	psh2 x6, x7
@@ -104,16 +104,36 @@ _kotodama_e:
 	psh2 x22, x23
 	psh2 x24, x25
 	psh2 x26, x27
-	psh2 x28, x29
+	psh2 x28, x29*/
 	psh2 x30, sp
 
+	/* the kernel can either pass the location of the
+		first insn to the interpreter itself, or a zero
+		pointer meaning it should read from a predefined
+		stack location aka 64kb from the start of kernel heap 
+	
+		this is passed in via x0
+			zero means there is no predefined instruction location
+			nonzero means we're fucking rawdogging memory from that
+			location.
+		the interpreter still just needs at least 64kb below the
+		instruction space to function (it assumes the insns are
+		at the root of the stack and allocates 64k for stack)
+	*/
+
+	cbz x0, _kt_zero_x0 	// if zero, load heap_bottom
+	b   _kt_preallocation	// otherwise, x0 holds location of first insn
+
+	_kt_zero_x0:
 	ldr x0, =heap_bottom
+
+	_kt_preallocation:
 	mov x1, 1
 	lsl x1, x1, 16
 	add x0, x0, x1 // lift x0 by 64kb off bottom
 	mov x2, x0     // this means 64kb of stack space
 
-	add x1, x1, x0 /* and another 64 bits for programs
+	add x1, x1, x0 /* and another 64kb for programs
 		which gives us 32767 characters of program, probs
 		more than I'll ever write for this thing. If I do
 		end up needing more, I'll just repeat this insn lol*/
@@ -146,7 +166,7 @@ _kotodama_e:
     	//b 		_kt_mainloop
 
 	pop2 x30, sp
-	pop2 x28, x29
+/*	pop2 x28, x29
 	pop2 x26, x27
 	pop2 x24, x25
 	pop2 x22, x23
@@ -160,7 +180,7 @@ _kotodama_e:
 	pop2 x6, x7
 	pop2 x4, x5
 	pop2 x2, x3
-	pop2 x0, x1
+	pop2 x0, x1*/
 ret
 
 /*

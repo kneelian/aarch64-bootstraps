@@ -18,6 +18,11 @@ SECTIONS
 	. = . + 0x400000; /* 4MB of framebuffer data space */
 	ramfb_top = .;
 	heap_bottom = .;
+	. = . + 0x10000; /* 64 kb of interpreter stack */
+	koto_stack = .;
+	koto_program = .;
+	. = . + 0x10000; /* 64 kb of interpreter insns by default */
+	koto_heap = .;
 	. = . + 0x10000000; /* 250MB of heap and other shit */
 	heap_top = .;
 }
