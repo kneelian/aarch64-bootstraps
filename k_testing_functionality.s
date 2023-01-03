@@ -14,7 +14,6 @@
 	str w1, [sp, -4]!
 	str w2, [sp, -4]!
 	bl _drawpx
-	add sp, sp, 12
 
 	ldr x20, =TEMPLATE_TEST_STRING
 	ldr x21, =EXAMPLE_STRING
@@ -127,6 +126,8 @@
 	newline 
 	bl _hash_3r_a_64b
 	bl _int2hex
+
+	newline
 /*
 	psh2 x0, x1
 	psh2 x2, x3
