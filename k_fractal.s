@@ -4,7 +4,7 @@
 	clr4 x0, x1, x2, x3
 	//psh  x4
 
-	add x2, xzr, 1
+	add x2, x2, 1
 
 	mov x3, 0xC000
 	lsl x3, x3, 4
