@@ -1,9 +1,5 @@
 	.section .text.startup
 	.global _Reset
-
-.include "k_macros.s"
-.include "k_macro_status_int.s"
-
 	_Reset:
 	    b 1f
 	    .skip 64
@@ -19,6 +15,9 @@
 // pushing and popping, to make
 // the operations slightly easier
 // to write
+
+.include "k_macros.s"
+.include "k_macro_status_int.s"
 
 	.section .text
 	1:
@@ -75,7 +74,7 @@
     	b 2f
 
 	2:
-	.include "k_uart_setup.s"
+		.include "k_uart_setup.s"
 
 		// now the UART should be barebones functional
 		
@@ -93,6 +92,8 @@
 		*/
 
 	.include "k_testing_functionality.s"
+
+	.include "k_fractal.s"
 
 
 	terminate:

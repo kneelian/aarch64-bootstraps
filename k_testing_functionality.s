@@ -145,4 +145,4 @@
 	pop2 x2, x3
 	pop2 x0, x1
 */
-	b terminate
+//	b terminate
