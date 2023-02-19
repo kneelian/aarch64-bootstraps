@@ -29,9 +29,11 @@
 			- character is beyond line width (128+ for 8x8, 64+ for 16x16)
 			- it encounters one of the illegal characters
 	*/
-
 	_c_read_line:
+		psh  x30
 
+
+		pop  x30
 		ret
 
 
