@@ -87,8 +87,6 @@
 			cmp  x1, x5
 			b.ge _c_read_line_exit
 
-		nop
-
 		mov x4, 0 // counter: how many characters have we written?
 
 		_c_read_line_loop:
@@ -124,7 +122,7 @@
 		pop2 x0, x1
 		pop  x30
 		add  sp, sp, 8
-		ret
+		returns
 
 	/*
 		blanks the screen one pixel at a time
