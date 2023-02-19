@@ -2,6 +2,54 @@
 
 	.align 8
 	/*
+		rotate lines
+
+		takes array of lines and then subs 1 from every line
+		if a line is already zero, it replaces it with a placeholder
+
+		takes one argument, returns nothing
+
+		loops until it hits a zero pointer or it trawls 1024 dwords
+	*/
+	_c_rotate_lines:
+		psh  x30
+		psh2 x0, x1
+		psh2 x2, x3
+
+		ldr  x0, [sp, 40]
+		add  x0, x0, 8
+
+		mov  x1, 1024
+
+		_c_rotate_lines_loop:
+			cbz x1, _c_rotate_lines_loop_end
+			sub x1, x1, 1
+
+			ldr x2, [x0], 8
+			cbz x2, _c_rotate_lines_loop_end
+
+			ldr x3, [x2]
+			cbz x3, _c_rotate_lines_last_line
+
+			// else: not last line
+
+			sub x3, x3, 1
+			str x3, [x2] // move it up the feed
+
+			_c_rotate_lines_last_line:
+			mov x3, 1
+			str x3, [x0]
+			b _c_rotate_lines_loop
+
+		_c_rotate_lines_loop_end: 
+
+		pop2 x2, x3
+		pop2 x0, x1
+		pop  x30
+		add  sp, sp, 8
+		ret
+
+	/*
 		takes the address of an array and pushes each
 		member to stack one by one and calls the
 		_c_read_line subroutine
@@ -18,12 +66,15 @@
 	_c_trawl_array_of_lines:
 		psh  x30
 		psh2 x0, x1
-		psh2 x2, x3
 
-		ldr x0, [sp, 40]
+		ldr x0, [sp, 24]
+		add x0, x0, 8
 		_c_trawl_array_of_lines_loop:
 			ldr x1, [x0], 8
-			cbz x1, _c_trawl_array_of_lines_loop_end
+			cbz x1, _c_trawl_array_of_lines_loop_end // zero pointer means end of array
+
+			sub x1, x1, 1
+			cbz x1, _c_trawl_array_of_lines_loop // one means empty/reserved slot
 
 			psh x1
 			bl _c_read_line
@@ -32,13 +83,10 @@
 
 		_c_trawl_array_of_lines_loop_end:
 
-		pop2 x2, x3
 		pop2 x0, x1
 		pop  x30
 		add  sp, sp, 8
 		ret
-
-
 	/*
 		reads a line (pointer to bytestream first argument)
 		until it either reaches 0x0000 or 0x000a or 0x000d
