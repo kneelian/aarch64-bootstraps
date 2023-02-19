@@ -2,6 +2,44 @@
 
 	.align 8
 	/*
+		takes the address of an array and pushes each
+		member to stack one by one and calls the
+		_c_read_line subroutine
+
+		basically meant to trawl an array of line
+		structs and print all of them one by one
+
+		takes one argument, returns nothing
+
+		loops until it hits a zero pointer
+		doesn't do santy checks other than zero pointer checks
+		so it can fuck up and brick trying to read from MMIO
+	*/
+	_c_trawl_array_of_lines:
+		psh  x30
+		psh2 x0, x1
+		psh2 x2, x3
+
+		ldr x0, [sp, 40]
+		_c_trawl_array_of_lines_loop:
+			ldr x1, [x0], 8
+			cbz x1, _c_trawl_array_of_lines_loop_end
+
+			psh x1
+			bl _c_read_line
+
+			b _c_trawl_array_of_lines_loop
+
+		_c_trawl_array_of_lines_loop_end:
+
+		pop2 x2, x3
+		pop2 x0, x1
+		pop  x30
+		add  sp, sp, 8
+		ret
+
+
+	/*
 		reads a line (pointer to bytestream first argument)
 		until it either reaches 0x0000 or 0x000a or 0x000d
 		which denote end of line
