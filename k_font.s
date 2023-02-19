@@ -1,4 +1,5 @@
 SIMPLE_FONT_8x8:
+	.dword 0x0000000000000000 // ZERO
 	.dword 0x183c66667e666600 // A
 	.dword 0x00fc66667c6666fc // B
 	.dword 0x003c66c0c0c0663c // C

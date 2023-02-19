@@ -30,6 +30,8 @@
 			- it encounters one of the illegal characters
 			- one of the specifiers is illegal or reserved
 	*/
+	_c_read_line_exit_preamble:
+		b _c_read_line_exit
 	_c_read_line:
 		psh  x30
 		psh2 x0, x1
@@ -45,7 +47,7 @@
 		ldr x2, [x0], 4  // size of font
 		ldr x3, [x0], 4  // number of font
 
-		cbnz x3, _c_read_line_exit
+		cbnz x3, _c_read_line_exit_preamble
 			// there is only one font allowed for now
 
 		cbz  x2, _c_read_line_size_0
@@ -90,7 +92,6 @@
 		mov x4, 0 // counter: how many characters have we written?
 
 		_c_read_line_loop:
-
 			ldr  x3, [x0], 2 // reusing it since we have only one font for now; WIP
 			and  x3, x3, 0xffff
 
@@ -105,6 +106,82 @@
 				WIP
 				here we're supposed to do funny printies
 			*/
+
+			// x2 holds size
+
+			cbz x2, _c_read_line_loop_8x8
+			sub x2, x2, 1
+			cbz x2, _c_read_line_loop_8x16
+			sub x2, x2, 1
+			cbz x2, _c_read_line_loop_16x16
+
+			b _c_read_line_exit // somehow this failed good job
+			// this branch is literally impossible or else
+			// it wouldve happened already, but safety first kids
+
+			_c_read_line_loop_8x8:
+			ldr x7, =SIMPLE_FONT_8x8
+			add x7, x7, x3
+
+			lsl x8, x1, 3 // mul 8
+			// x8 holds the y pixel
+			lsl x9, x4, 3 // mul 8
+			// x9 holds the x pixel
+			mov  w5, 1
+			str  w5, [sp, -4]! // col pt 1
+			movn w5, 0
+			str  w5, [sp, -4]! // col pt 2
+			str  w8, [sp, -4]! // y
+			str  w9, [sp, -4]! // x 
+			psh  x7			   // bitmap 
+
+			bl _draw_8x8
+			b  _c_read_line_loop_skip
+
+			_c_read_line_loop_8x16:
+			ldr x7, =SIMPLE_FONT_8x16
+			add x2, x2, 1
+			add x3, x3, x3
+			add x7, x7, x3
+
+			lsl x8, x1, 4 // mul 16
+			// x8 holds the y pixel
+			lsl x9, x4, 3 // mul 8
+			// x9 holds the x pixel
+			mov  w5, 1
+			str  w5, [sp, -4]! // col pt 1
+			movn w5, 0
+			str  w5, [sp, -4]! // col pt 2
+			str  w8, [sp, -4]! // y
+			str  w9, [sp, -4]! // x 
+			psh  x7			   // bitmap 
+
+			bl _draw_8x16
+			b  _c_read_line_loop_skip
+
+			_c_read_line_loop_16x16:
+			ldr x7, =SIMPLE_FONT_16x16
+			add x2, x2, 2
+			add x3, x3, x3
+			add x3, x3, x3
+			add x7, x7, x3
+
+			lsl x8, x1, 4 // mul 16
+			// x8 holds the y pixel
+			lsl x9, x4, 4 // mul 8
+			// x9 holds the x pixel
+			mov  w5, 1
+			str  w5, [sp, -4]! // col pt 1
+			movn w5, 0
+			str  w5, [sp, -4]! // col pt 2
+			str  w8, [sp, -4]! // y
+			str  w9, [sp, -4]! // x 
+			psh  x7			   // bitmap 
+
+			bl _draw_16x16
+			b  _c_read_line_loop_skip
+
+			_c_read_line_loop_skip:
 
 			cmp  x4, x6
 			b.ge _c_read_line_exit
@@ -122,7 +199,7 @@
 		pop2 x0, x1
 		pop  x30
 		add  sp, sp, 8
-		returns
+		ret
 
 	/*
 		blanks the screen one pixel at a time
@@ -243,7 +320,7 @@
 		pop2 x2, x3
 		pop2 x0, x1
 
-		add sp, sp, 16
+		add sp, sp, 24
 		ret
 
 	/*
