@@ -93,8 +93,13 @@
 
 	.include "k_testing_functionality.s"
 
-	.include "k_fractal.s"
+	.include "k_console.s"
 
+	//.include "k_fractal.s"
+
+	isb
+
+	bl _blank_screen
 
 	terminate:
 	997:
