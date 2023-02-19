@@ -36,10 +36,11 @@
 		psh2 x2, x3
 		psh2 x4, x5
 		psh2 x6, x7
+		psh2 x8, x9
 
 		mov x4, 1
 
-		ldr x0, [sp, 72] // address of struct
+		ldr x0, [sp, 88] // address of struct
 		ldr x1, [x0], 4  // line number
 		ldr x2, [x0], 4  // size of font
 		ldr x3, [x0], 4  // number of font
@@ -86,9 +87,37 @@
 			cmp  x1, x5
 			b.ge _c_read_line_exit
 
+		nop
+
+		mov x4, 0 // counter: how many characters have we written?
+
+		_c_read_line_loop:
+
+			ldr  x3, [x0], 2 // reusing it since we have only one font for now; WIP
+			and  x3, x3, 0xffff
+
+			cbz  x3, _c_read_line_exit // 0x0000 null EOL
+			sub  x3, x3, 0xa
+			cbz  x3, _c_read_line_exit
+			sub  x3, x3, 0x2
+			cbz  x3, _c_read_line_exit
+			add  x3, x3, 0xd
+
+			/*
+				WIP
+				here we're supposed to do funny printies
+			*/
+
+			cmp  x4, x6
+			b.ge _c_read_line_exit
+			add  x4, x4, 1
+
+			b _c_read_line_loop
+
 		_c_read_line_exit:
 			// something errored. this is the label that
 			// restores the stack and cleanly returns to caller
+		pop2 x8, x9
 		pop2 x6, x7
 		pop2 x4, x5
 		pop2 x2, x3
@@ -96,7 +125,6 @@
 		pop  x30
 		add  sp, sp, 8
 		ret
-
 
 	/*
 		blanks the screen one pixel at a time
