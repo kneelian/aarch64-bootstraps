@@ -28,12 +28,73 @@
 			- the line number is illegal (96+ for 8x8, 48+ for 16x16)
 			- character is beyond line width (128+ for 8x8, 64+ for 16x16)
 			- it encounters one of the illegal characters
+			- one of the specifiers is illegal or reserved
 	*/
 	_c_read_line:
 		psh  x30
+		psh2 x0, x1
+		psh2 x2, x3
+		psh2 x4, x5
+		psh2 x6, x7
 
+		mov x4, 1
 
+		ldr x0, [sp, 72] // address of struct
+		ldr x1, [x0], 4  // line number
+		ldr x2, [x0], 4  // size of font
+		ldr x3, [x0], 4  // number of font
+
+		cbnz x3, _c_read_line_exit
+			// there is only one font allowed for now
+
+		cbz  x2, _c_read_line_size_0
+
+		cmp  x2, x4
+		b.eq _c_read_line_size_1
+
+		add  x4, x4, 1
+		cmp  x2, x4
+		b.eq _c_read_line_size_2
+
+		b _c_read_line_exit
+			// reserved sizes are a silent failure
+
+		_c_read_line_size_0:
+			//   8x8. this means the max line number is 96
+			//   and max line width is 128
+			mov x5, 96
+			mov x6, 128
+
+			cmp  x1, x5
+			b.ge _c_read_line_exit
+
+		_c_read_line_size_1:
+			//  8x16. this means the max line number is 48 
+			//  and max line width is 128
+			mov x5, 48
+			mov x6, 128
+
+			cmp  x1, x5
+			b.ge _c_read_line_exit
+
+		_c_read_line_size_2:
+			// 16x16. this means the max line number is 48 
+			// and max line width is 64
+			mov x5, 48
+			mov x6, 64
+
+			cmp  x1, x5
+			b.ge _c_read_line_exit
+
+		_c_read_line_exit:
+			// something errored. this is the label that
+			// restores the stack and cleanly returns to caller
+		pop2 x6, x7
+		pop2 x4, x5
+		pop2 x2, x3
+		pop2 x0, x1
 		pop  x30
+		add  sp, sp, 8
 		ret
 
 
@@ -44,8 +105,7 @@
 
 	_blank_screen:
 		psh2 x0, x1
-		psh2 x2, x3
-		psh  x4
+		psh  x2
 
 		ldr x0, =ramfb_bottom
 		mov x1, 1024
@@ -61,11 +121,8 @@
 			sub  x1, x1, 1
 			cbnz x1, _blank_screen_loop
 
-		pop  x4
-		pop2 x2, x3
+		pop  x2
 		pop2 x0, x1 
-
-		mov x17, 0x5050
 
 		ret
 
