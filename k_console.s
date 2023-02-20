@@ -2,6 +2,49 @@
 
 	.align 8
 	/*
+		insert new line pointer
+
+		takes array of lines, trawls it for first free slot
+		either zero or one
+		and then inserts a pointer into it
+
+		takes two arguments:
+			- pointer to array
+			- pointer to line
+
+		returns flag:
+			- 0 if write was successful
+			- 1 if there wasn't room
+			- other values reserved
+	*/
+	_c_insert_line:
+		psh  x30
+		psh2 x0, x1
+		psh2 x2, x3
+
+		ldr x0, [sp, 40]
+		ldr x1, [sp, 48]
+
+		cbnz x0, _c_insert_line_addr_given
+
+		// otherwise, load default value
+		ldr x0, =LINES_ARRAY
+
+		_c_insert_line_addr_given:
+
+		/*
+			WIP magic happens here
+		*/
+
+		pop2 x2, x3
+		pop2 x0, x1
+		pop  x30
+
+		add sp, sp, 8
+
+		ret
+
+	/*
 		rotate lines
 
 		takes array of lines and then subs 1 from every line
