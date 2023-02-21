@@ -24,6 +24,6 @@ SIMPLE_FONT_16x16:
 
 LINES_ARRAY:
 
-.skip 4096
+.skip 8192
 
 .align 8

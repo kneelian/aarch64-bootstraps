@@ -22,8 +22,10 @@
 		psh2 x0, x1
 		psh2 x2, x3
 
-		ldr x0, [sp, 40]
-		ldr x1, [sp, 48]
+		ldr x0, [sp, 40] // root array
+		ldr x1, [sp, 48] // line to insert
+
+		mov x2, 1024
 
 		cbnz x0, _c_insert_line_addr_given
 
@@ -31,10 +33,19 @@
 		ldr x0, =LINES_ARRAY
 
 		_c_insert_line_addr_given:
+			ldr x3, [x0]
 
-		/*
-			WIP magic happens here
-		*/
+			eor  x3, x3, 1
+			cbnz x3, _c_insert_line_addr_given_conflict // the address isnt 0 or 1
+
+			sub x2, x2, 1
+			cbz x2, _c_insert_line_no_room
+
+			str x1, [x0]
+
+			b _c_insert_line_addr_given
+			
+		_c_insert_line_end:
 
 		pop2 x2, x3
 		pop2 x0, x1
@@ -43,6 +54,15 @@
 		add sp, sp, 8
 
 		ret
+
+		_c_insert_line_no_room:
+			mov x1, 1
+			str x1, [sp, 48]
+			b _c_insert_line_end
+
+		_c_insert_line_addr_given_conflict:
+			add x0, x0, 8
+			b _c_insert_line_addr_given
 
 	/*
 		rotate lines
