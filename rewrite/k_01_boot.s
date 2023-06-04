@@ -122,7 +122,7 @@ nosleep:
 		last in the kernel, when we are calling processes
 	*/
 
-	wfi
+	wfi // we are bricking here for now
 
 	mrs  x1, SPSR_EL1
 	and  x2, x1, 0xf
