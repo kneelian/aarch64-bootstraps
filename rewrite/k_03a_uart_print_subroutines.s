@@ -25,6 +25,7 @@
 	// our print function
 	// takes 1 arg on stack, returns 0
 	// trashes 2 registers
+	.global _uputc
 	_uputc:
 		psh2 x0, x1
 
@@ -56,7 +57,7 @@
 
 	/*
 	   string print function
-	  x0 - address of string
+	 	  x0 - address of string
           x1 - scratch register for bytes
 
 	  takes string address in x0, returns nothing
