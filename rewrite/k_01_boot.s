@@ -42,7 +42,7 @@ _Reset:
 
 	mrs  x0, mpidr_el1
 	and  x0, x0, 0x3
-	cbz x0, nosleep
+	cbz  x0, nosleep
 
 sleep:
 	wfi
@@ -92,6 +92,10 @@ nosleep:
 	.align 8
 	_KERNEL_VER: .asciz "0.01b"
 	.align 8
+	_DMA_DETECTED_MSG: .asciz "DMA device detected\n\r"
+	.align 8
+	_RAMFB_INITIALISED_MSG: .asciz "RAMFB device initialised \n\r"
+	.align 8
 
 2:
 	ldr x0, =_UART_ACTIVATED_MSG
@@ -113,6 +117,10 @@ nosleep:
 	bl _uputc
 	bl _sub_newline
 
+	isb
+
+	bl _Ramfb_Setup
+
 	mov x5, 1000
 	fmov d4, x5
 	/*
@@ -122,7 +130,7 @@ nosleep:
 		last in the kernel, when we are calling processes
 	*/
 
-	wfi
+	wfi // we are bricking here for now
 
 	mrs  x1, SPSR_EL1
 	and  x2, x1, 0xf
