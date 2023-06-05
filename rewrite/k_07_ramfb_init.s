@@ -1,4 +1,5 @@
 .include "k_06b_stack_macros.s"
+.include "k_06c_status_macro.s"
 
 .section .text
 .global _Ramfb_Setup
@@ -282,14 +283,67 @@
 	mov  x12, xzr
 
 	_putpx_test:
+		cbz w10, 1f
+		cbz w11, 1f
 		pshw w10
 		pshw w11
 		pshw w12
 		bl _put_px
 		sub  w10, w10, 1
 		sub  w11, w11, 1
-		cbnz w10, _putpx_test
-		cbnz w11, _putpx_test
+		b _putpx_test
+	1:
+
+		mov x10, 256
+		mov x11, 512
+		mov x12, 128
+		mov x13, 384
+		mov x14, xzr
+		pshw w10
+		pshw w11
+		pshw w12
+		pshw w13
+		pshw w14
+	bl _draw_rect
+
+		mov x10, 312
+		mov x11, 748
+		mov x12, 158
+		mov x13, 212
+		mov w14, 0x9900
+		add w14, w14, 0xff
+		pshw w10
+		pshw w11
+		pshw w12
+		pshw w13
+		pshw w14
+	bl _draw_rect
+
+		mov x10, 115
+		mov x11, 524
+		mov x12, 208
+		mov x13, 272
+		mov w14, 0x5555
+		add w14, w14, 0xff
+		pshw w10
+		pshw w11
+		pshw w12
+		pshw w13
+		pshw w14
+	bl _draw_rect
+
+		mov x10, 31
+		mov x11, 440
+		mov x12, 258
+		mov x13, 412
+		mov w14, 0xf000
+		add w14, w14, 0xf0
+		pshw w10
+		pshw w11
+		pshw w12
+		pshw w13
+		pshw w14
+	bl _draw_rect
 
 	pop x30
 	ret
@@ -305,7 +359,7 @@
 	trashes x0-x4
 
 	takes colour, x, y on stack, returns nothing
-	void drawpx(int x, int y, int colour);
+	void _put_px(int x, int y, int colour);
 */
 
 .global _put_px
@@ -325,5 +379,68 @@ _put_px:
 	lsl  x2, x2, 2
 
 	str w3, [x0, x2]
+
+	ret
+
+/*
+	rectangle draw function
+		sp     > colour i32
+		sp-4   > max y  i32
+		sp-8   > min y  i32
+		sp-12  > max x  i32
+		sp-16  > min x  i32
+
+	trashes x5-x10
+
+	void _draw_rect();
+*/
+
+.global _draw_rect
+_draw_rect:
+	
+	popw w10// col
+
+	popw w5 // ymax
+	popw w6 // ymin, ycurr
+	popw w7 // xmax
+	popw w8 // xmin, xcurr
+
+	psh x30
+
+	mov w9, w8 // temporary
+
+	/*
+	assumptions:
+
+		w5 > w6
+		w7 > w8
+	*/
+
+	cmp x5, x6
+	ble 99f
+	cmp x7, x8
+	ble 99f
+
+
+	1:
+		// loop
+		pshw w8 // x
+		pshw w6 // y
+		pshw w10// col
+
+		bl _put_px
+
+		add w8, w8, 1
+		cmp w8, w7
+		blt 1b         // if xmin < xmax jump back
+
+		mov w8, w9     // otherwise restore and compare y
+		add w6, w6, 1
+		cmp w6, w5
+		blt 1b		   // else fallthrough
+
+	99:
+	pop x30
+//	status_int
 
 	ret

@@ -6,11 +6,21 @@
 	stp \rega, \regb, [sp, #-16]!
 .endm
 
+.macro psh4 rega regb regc regd
+	stp \rega, \regb, [sp, #-16]!
+	stp \regc, \regd, [sp, #-16]!
+.endm
+
 .macro pop reg
 	ldr \reg, [sp], 8
 .endm
 
 .macro pop2 rega regb
+	ldp \rega, \regb, [sp], 16
+.endm
+
+.macro pop4 rega regb regc regd
+	ldp \regc, \regd, [sp], 16
 	ldp \rega, \regb, [sp], 16
 .endm
 

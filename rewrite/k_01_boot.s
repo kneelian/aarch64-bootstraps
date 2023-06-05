@@ -1,5 +1,6 @@
 .include "k_06a_register_val_macros.s"
 .include "k_06b_stack_macros.s"
+.include "k_06c_status_macro.s"
 
 .section .text.startup
 .global _Reset
@@ -123,6 +124,11 @@ nosleep:
 
 	mov x5, 1000
 	fmov d4, x5
+
+	mov  x10, 'S'
+	psh  x10
+	bl  _uputc
+	ping
 	/*
 		generally speaking, we should finish setting up
 		our kernel functions before we relinquish control

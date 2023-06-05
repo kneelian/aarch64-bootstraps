@@ -1,3 +1,14 @@
+.macro newline
+	psh x0
+	mov x0, 13
+	psh x0
+	mov x0, 10
+	psh x0
+	bl  _uputc
+	bl  _uputc
+	pop x0
+.endm
+
 .macro status_int
 	newline
 
