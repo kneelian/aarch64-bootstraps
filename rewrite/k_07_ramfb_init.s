@@ -56,6 +56,7 @@
 		// to see if the DMA is available we need to pass 0x0000 to the
 		// selector, and then read 8 bytes from the address in the ADDRESS register
 	_Ramfb_Setup:
+		psh  x30
 		ldr  x0, =0x09020000 // base address, also data address address
 		add  x0, x0, 8       // selector
 
@@ -221,51 +222,6 @@
 
 		str x2, [x0]
 
-		/*
-
-		struct __attribute__((__packed__)) QemuRAMFBCfg {
-		    uint64_t addr;
-		    uint32_t fourcc;
-		    uint32_t flags;
-		    uint32_t width;
-		    uint32_t height;
-		    uint32_t stride;
-		};
-
-		
-	
-	mov x20, 1024
-	mov x21, 768
-	mul x20, x20, x21 
-	ldr x22, =ramfb_bottom
-	mov x21, 0
-	framebuffer_example:
-		str w21, [x22]
-		add w21, w21, 48
-		add x22, x22, 4
-		sub x20, x20, 1
-		cbnz x20, framebuffer_example
-
-
-	mov  x5, 1024 // x
-	mov  x6, 768  // y
-	movn x7, 0x0  // 0xffffffff
-	psh x30
-	framebuffer_example_2:
-		pshw w5
-		pshw w6
-		pshw w7
-		bl _put_px
-
-		sub  x6, x6, 1
-		cbnz x6, framebuffer_example_2
-		// else x5 = 0
-		sub  x5, x5, 1
-		mov  x6, 1024
-		cbnz x5, framebuffer_example_2
-
-	pop x30*/
-
 	ldr  x0, =ramfb_bottom
 	mov  x1, 768
 	mov  x2, 4096    // 1024 x 4
@@ -345,102 +301,36 @@
 		pshw w14
 	bl _draw_rect
 
+
+		mov  x10, 652 // x
+		mov  x11, 652 // y
+		mov  x12, #0  // fg
+		movn x13, #0  // bg
+		mov  x14, #0  // font
+		mov  x15, #4  // char  //
+		pshw w14
+		pshw w15
+		pshw w11
+		pshw w10
+		pshw w13
+		pshw w12
+	bl _drawchar_8x8
+
+		ldr  x10, =SIMPLE_FONT_8x8
+		add  x10, x10, 8
+		ldr  x10, [x10]
+		mov  x11, 752
+		mov  x12, 752
+		movn w13, 0
+		ror  x13, x13, 32
+		psh  x13
+		pshw w12
+		pshw w11
+		psh  x10
+	bl _draw_8x8
+
 	pop x30
 	ret
 
-
-
-/*
-	pixel draw function
-		sp    > colour i32
-		sp-4  > y      i32
-		sp-8  > x      i32
-
-	trashes x0-x4
-
-	takes colour, x, y on stack, returns nothing
-	void _put_px(int x, int y, int colour);
-*/
-
-.global _put_px
-_put_px:
-	
-	popw w3  // colour
-	popw w2  // y
-	popw w1  // x
-
-	ldr  x0, =ramfb_bottom
-
-	// pos = x * y * 4   +  base
-
-	mov  x4, 1024
-
-	madd x2, x2, x4, x1
-	lsl  x2, x2, 2
-
-	str w3, [x0, x2]
-
-	ret
-
-/*
-	rectangle draw function
-		sp     > colour i32
-		sp-4   > max y  i32
-		sp-8   > min y  i32
-		sp-12  > max x  i32
-		sp-16  > min x  i32
-
-	trashes x5-x10
-
-	void _draw_rect();
-*/
-
-.global _draw_rect
-_draw_rect:
-	
-	popw w10// col
-
-	popw w5 // ymax
-	popw w6 // ymin, ycurr
-	popw w7 // xmax
-	popw w8 // xmin, xcurr
-
-	psh x30
-
-	mov w9, w8 // temporary
-
-	/*
-	assumptions:
-
-		w5 > w6
-		w7 > w8
-	*/
-
-	cmp x5, x6
-	ble 99f
-	cmp x7, x8
-	ble 99f
-
-
-	1:
-		// loop
-		pshw w8 // x
-		pshw w6 // y
-		pshw w10// col
-
-		bl _put_px
-
-		add w8, w8, 1
-		cmp w8, w7
-		blt 1b         // if xmin < xmax jump back
-
-		mov w8, w9     // otherwise restore and compare y
-		add w6, w6, 1
-		cmp w6, w5
-		blt 1b		   // else fallthrough
-
-	99:
-	pop x30
-//	status_int
-
-	ret
+.include "k_07a_ramfb_procedures.s"
+.include "k_07b_font.s"

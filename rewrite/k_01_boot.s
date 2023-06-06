@@ -128,7 +128,6 @@ nosleep:
 	mov  x10, 'S'
 	psh  x10
 	bl  _uputc
-	ping
 	/*
 		generally speaking, we should finish setting up
 		our kernel functions before we relinquish control
