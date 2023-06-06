@@ -307,7 +307,7 @@
 		mov  x12, #0  // fg
 		movn x13, #0  // bg
 		mov  x14, #0  // font
-		mov  x15, #4  // char  //
+		mov  x15, #4  // char
 		pshw w14
 		pshw w15
 		pshw w11
@@ -315,6 +315,20 @@
 		pshw w13
 		pshw w12
 	bl _drawchar_8x8
+
+		mov  x10, 152 // x
+		mov  x11, 152 // y
+		mov  x12, #0  // fg
+		movn x13, #0  // bg
+		mov  x14, #0  // font
+		mov  x15, #0  // char
+		pshw w14
+		pshw w15
+		pshw w11
+		pshw w10
+		pshw w13
+		pshw w12
+	bl _drawchar_8x16
 
 		ldr  x10, =SIMPLE_FONT_8x8
 		add  x10, x10, 8

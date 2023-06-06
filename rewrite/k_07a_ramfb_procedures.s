@@ -143,6 +143,133 @@ _draw_rect:
 	ret
 
 /*
+	8x16 character draw function
+		sp      > fg colour i32
+		sp-4    > bg colour i32
+		sp-8    > x         i32
+		sp-12   > y         i32
+		sp-16   > char id   i32
+		sp-20   > font id   i32
+	
+	same as below just with a bigger
+	character this time. Renders it in
+	two halves
+*/
+.global _drawchar_8x16
+_drawchar_8x16:
+	psh2 x0, x1
+	psh2 x2, x3
+	psh2 x4, x5
+	psh2 x6, x30
+	psh2 x7, x8
+
+	ldr w0, [sp, 80]  // fg
+	ldr w1, [sp, 84]  // bg
+	ldr w2, [sp, 88]  // x
+	ldr w3, [sp, 92]  // y
+	ldr w4, [sp, 96]  // char id
+	ldr w5, [sp, 100] // font id
+
+	ldr x6, =FONTS_8x16
+	ldr x7, [x6]       // number of fonts
+	cmp w5, w7
+	bge 99f
+
+	add x5, x5, 1
+	lsl w5, w5, 3
+
+	ldr x6, [x6, x5]   // load the font we want
+
+	lsl x5, x4, 4
+	add x5, x6, x5     // and the character from it
+	ldr x6, [x5]
+
+	rbit x6, x6
+
+	/*
+		now x6 contains the bitmap reversed
+		and regs x7 and x8 are scratch
+	*/
+
+	mov x7, xzr		// x offset
+	mov x8, xzr		// y offset
+	1:
+		and  x4, x6, #1
+
+		cmp  x4, #1
+		csel w20, w0, w1, eq
+
+		cmp  w20, #1 // skip if transparent
+		b.eq 2f
+
+		add x21, x2, x7
+		add x22, x3, x8
+
+		bl _put_px_x20
+		add x7, x7, 1
+
+		2:
+
+		lsr  x6, x6, 1
+
+		cmp  x7, 8
+		b.lt 1b
+		
+		mov  x7, xzr
+
+		add  x8, x8, 1
+		cmp  x8, 8
+
+		b.lt 1b
+
+	add x5, x5, 8
+	ldr x6, [x5]
+	rbit x6, x6
+	add w3, w3, 8
+	mov x7, xzr
+	mov x8, xzr
+	3:
+		and  x4, x6, #1
+
+		cmp  x4, #1
+		csel w20, w0, w1, eq
+
+		cmp  w20, #1 // skip if transparent
+		b.eq 4f
+
+		add x21, x2, x7
+		add x22, x3, x8
+
+		bl _put_px_x20
+		add x7, x7, 1
+		4:
+		lsr  x6, x6, 1
+
+		cmp  x7, 8
+		b.lt 3b
+		
+		mov  x7, xzr
+
+		add  x8, x8, 1
+		cmp  x8, 8
+
+		b.lt 3b
+
+	99:
+
+	pop2 x7, x8
+	pop2 x6, x30
+	pop2 x4, x5
+	pop2 x2, x3
+	pop2 x0, x1
+
+	add sp, sp, 24 // pop the arguments off stack! important
+
+	ret
+
+
+
+/*
 	8x8 character draw function
 		sp      > fg colour i32
 		sp-4    > bg colour i32

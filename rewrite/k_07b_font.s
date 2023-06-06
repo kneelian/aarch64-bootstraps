@@ -25,6 +25,7 @@ SIMPLE_FONT_8x8:
 	.dword 0x00fc66667c6666fc // B
 	.dword 0x003c66c0c0c0663c // C
 	.dword 0x00f86c6666666cf8 // D
+.skip 16
 
 SIMPLE_FONT_8x16:
 	.dword 0x000010386cc6c6fe, 0xc6c6c6c600000000 // IBM A
